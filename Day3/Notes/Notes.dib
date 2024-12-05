@@ -1,0 +1,31 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+string testString = "mul(23,16)";
+char[] testArr = testString.ToCharArray();
+int commaIndex = Array.IndexOf(testArr, ',');
+commaIndex.Display();
+testArr.Display();
+int num1 = int.Parse(testArr[4..commaIndex].AsSpan());
+int num2 = int.Parse(testArr[(commaIndex + 1)..^1].AsSpan());
+
+(num1, num2).Display();
+// (part1, part2).Display();
+
+#!csharp
+
+using System.Text.RegularExpressions;
+
+string pattern = @"(do(n't)?)\(\)";
+string testString = "mul(123,456) do() don't() mul(7,8)xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
+
+Match doMatch = Regex.Match(testString, pattern);
+while (doMatch.Success)
+{
+    Console.WriteLine($"{doMatch.Value} at {doMatch.Index}");
+
+    doMatch = doMatch.NextMatch();
+}

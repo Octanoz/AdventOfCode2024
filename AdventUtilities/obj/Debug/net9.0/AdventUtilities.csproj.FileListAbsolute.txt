@@ -1,0 +1,11 @@
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\bin\Debug\net9.0\AdventUtilities.deps.json
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\bin\Debug\net9.0\AdventUtilities.dll
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\bin\Debug\net9.0\AdventUtilities.pdb
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.AssemblyInfoInputs.cache
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.AssemblyInfo.cs
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.csproj.CoreCompileInputs.cache
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.dll
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\refint\AdventUtilities.dll
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.pdb
+C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\ref\AdventUtilities.dll
