@@ -2,7 +2,7 @@
 
 namespace Day4.Tests;
 
-public class Day4Tests
+public class Day04Tests
 {
     private readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day4/example1.txt");
     private readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day4/input.txt");

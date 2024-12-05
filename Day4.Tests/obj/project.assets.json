@@ -422,17 +422,17 @@
           "bin/placeholder/AdventUtilities.dll": {}
         }
       },
-      "Day4/1.0.0": {
+      "Day04/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
           "AdventUtilities": "1.0.0"
         },
         "compile": {
-          "bin/placeholder/Day4.dll": {}
+          "bin/placeholder/Day04.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Day4.dll": {}
+          "bin/placeholder/Day04.dll": {}
         }
       }
     }
@@ -961,16 +961,16 @@
       "path": "../AdventUtilities/AdventUtilities.csproj",
       "msbuildProject": "../AdventUtilities/AdventUtilities.csproj"
     },
-    "Day4/1.0.0": {
+    "Day04/1.0.0": {
       "type": "project",
-      "path": "../Day4/Day4.csproj",
-      "msbuildProject": "../Day4/Day4.csproj"
+      "path": "../Day4/Day04.csproj",
+      "msbuildProject": "../Day4/Day04.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net9.0": [
       "AdventUtilities >= 1.0.0",
-      "Day4 >= 1.0.0",
+      "Day04 >= 1.0.0",
       "Microsoft.NET.Test.Sdk >= 17.12.0",
       "coverlet.collector >= 6.0.2",
       "xunit >= 2.9.2",
@@ -984,11 +984,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4.Tests\\Day4.Tests.csproj",
-      "projectName": "Day4.Tests",
-      "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4.Tests\\Day4.Tests.csproj",
+      "projectUniqueName": "c:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4.Tests\\Day04.Tests.csproj",
+      "projectName": "Day04.Tests",
+      "projectPath": "c:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4.Tests\\Day04.Tests.csproj",
       "packagesPath": "C:\\Users\\rheye\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4.Tests\\obj\\",
+      "outputPath": "c:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1012,8 +1012,8 @@
             "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\AdventUtilities\\AdventUtilities.csproj": {
               "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\AdventUtilities\\AdventUtilities.csproj"
             },
-            "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day4.csproj": {
-              "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day4.csproj"
+            "c:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day04.csproj": {
+              "projectPath": "c:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day04.csproj"
             }
           }
         }

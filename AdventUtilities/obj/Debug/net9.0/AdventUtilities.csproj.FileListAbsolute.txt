@@ -9,3 +9,4 @@ C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\ne
 C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\refint\AdventUtilities.dll
 C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.pdb
 C:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\ref\AdventUtilities.dll
+c:\Users\rheye\OneDrive\Documents\AdventOfCode\2024\AdventUtilities\obj\Debug\net9.0\AdventUtilities.sourcelink.json

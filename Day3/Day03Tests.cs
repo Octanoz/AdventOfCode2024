@@ -4,7 +4,7 @@ using Xunit;
 using AdventUtilities;
 
 
-public class Day3Tests
+public class Day03Tests
 {
     private static readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day3/example1.txt");
     private static readonly string testPath2 = Path.Combine(InputData.GetSolutionDirectory(), "Day3/example2.txt");

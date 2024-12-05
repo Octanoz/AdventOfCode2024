@@ -3,7 +3,7 @@ namespace Day2;
 using Xunit;
 using AdventUtilities;
 
-public class Day2Tests
+public class Day02Tests
 {
     private static readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day2/example1.txt");
     private static readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day2/input.txt");

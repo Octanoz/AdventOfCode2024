@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AdventUtilities\AdventUtilities.csproj" />
-    <ProjectReference Include="..\Day4\Day4.csproj" />
+    <ProjectReference Include="..\Day4\Day04.csproj" />
   </ItemGroup>
 
   <ItemGroup>

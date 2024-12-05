@@ -889,9 +889,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day3\\Day3.csproj",
-      "projectName": "Day3",
-      "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day3\\Day3.csproj",
+      "projectUniqueName": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day3\\Day03.csproj",
+      "projectName": "Day03",
+      "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day3\\Day03.csproj",
       "packagesPath": "C:\\Users\\rheye\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day3\\obj\\",
       "projectStyle": "PackageReference",

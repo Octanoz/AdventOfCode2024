@@ -100,8 +100,8 @@
               "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\AdventUtilities\\AdventUtilities.csproj": {
                 "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\AdventUtilities\\AdventUtilities.csproj"
               },
-              "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day4.csproj": {
-                "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day4.csproj"
+              "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day04.csproj": {
+                "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day04.csproj"
               }
             }
           }
@@ -159,12 +159,12 @@
         }
       }
     },
-    "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day4.csproj": {
+    "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day04.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day4.csproj",
-        "projectName": "Day4",
-        "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day4.csproj",
+        "projectUniqueName": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day04.csproj",
+        "projectName": "Day04",
+        "projectPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\Day04.csproj",
         "packagesPath": "C:\\Users\\rheye\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day4\\obj\\",
         "projectStyle": "PackageReference",

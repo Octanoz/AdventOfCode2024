@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "PEGQH35+z4E=",
+  "dgSpecHash": "nry5JQJX2RE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day1\\Day1.csproj",
+  "projectFilePath": "C:\\Users\\rheye\\OneDrive\\Documents\\AdventOfCode\\2024\\Day1\\Day01.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\rheye\\.nuget\\packages\\microsoft.codecoverage\\17.12.0\\microsoft.codecoverage.17.12.0.nupkg.sha512",
     "C:\\Users\\rheye\\.nuget\\packages\\microsoft.net.test.sdk\\17.12.0\\microsoft.net.test.sdk.17.12.0.nupkg.sha512",

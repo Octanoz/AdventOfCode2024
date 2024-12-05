@@ -4,7 +4,7 @@ using AdventUtilities;
 using Xunit;
 
 
-public class Day1Tests
+public class Day01Tests
 {
     [Theory]
     [InlineData(new[] { "3   4", "4   3", "2   5", "1   3", "3   9", "3   3" }, 11)]
