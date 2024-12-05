@@ -7,7 +7,6 @@ public class Page(int id)
     public int Id { get; } = id;
     public List<Page> Before { get; private set; } = [];
     public List<Page> After { get; private set; } = [];
-    public int TotalPagesToStore { get; set; }
 
     public void AddAfter(Page afterPage, HashSet<int> visited)
     {

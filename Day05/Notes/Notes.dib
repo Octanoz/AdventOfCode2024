@@ -4,6 +4,28 @@
 
 #!csharp
 
+using System.IO;
+
+string filePath = @"..\input.txt";
+
+string[] input = File.ReadAllLines(filePath);
+
+input[..10].Display();
+
+#!csharp
+
+int splitIndex = Array.FindIndex(input, s => s == "");
+string[] rules = input[..splitIndex];
+string[] manuals = input[(splitIndex + 1)..];
+
+#!csharp
+
+Dictionary<int, int> ruleCount = rules.SelectMany(arr => Array.ConvertAll(arr.Split('|'), int.Parse)).GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
+
+// ruleCount.Display();
+
+#!csharp
+
 string[] input =
 [
 "47|53",
@@ -35,48 +57,3 @@ string[] input =
 "61,13,29",
 "97,13,75,29,47"
 ];
-
-#!csharp
-
-int splitIndex = Array.FindIndex(input, s => s == "");
-string[] rules = input[..splitIndex];
-string[] manuals = input[(splitIndex + 1)..];
-
-#!csharp
-
-rules.Display();
-manuals.Display();
-
-#!csharp
-
-public class Node(int id)
-{
-    public int Id {get;} = id;
-    public int Counter { get; set; } = 0;
-}
-
-Dictionary<int, Node> dict = new()
-{
-    [1] = new(1),
-    [2] = new(2),
-    [3] = new(3),
-};
-
-int[] ids = [1, 4, 2, 1, 4, 2];
-foreach (var id in ids)
-{
-    // Node current = dict.TryGetValue(id, out var f) ? f : dict[id] = new(id);
-    if (!dict.TryGetValue(id, out var current))
-    {
-        current = dict[id] = new(id);
-    }
-    current.Counter++;
-    current.Display();
-    System.Threading.Thread.Sleep(1000);
-}
-
-#!csharp
-
-Dictionary<int, int> ruleCount = rules.SelectMany(arr => Array.ConvertAll(arr.Split('|'), int.Parse)).GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
-
-ruleCount.Display();

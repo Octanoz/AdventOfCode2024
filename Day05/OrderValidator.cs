@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace Day05;
 
 public class OrderValidator
@@ -134,8 +136,7 @@ public class OrderValidator
                 second = pageMap[rule[1]];
             }
 
-            first.AddAfter(second, []);
-            second.AddBefore(first, []);
+            Connect(first, second);
 
             if (--ruleCount[first.Id] is 0)
             {
@@ -149,5 +150,11 @@ public class OrderValidator
         }
 
         return queue;
+    }
+
+    private static void Connect(Page a, Page b)
+    {
+        a.AddAfter(b, []);
+        b.AddBefore(a, []);
     }
 }
