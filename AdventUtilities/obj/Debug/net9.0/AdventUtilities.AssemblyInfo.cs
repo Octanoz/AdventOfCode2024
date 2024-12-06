@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AdventUtilities")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e05ab98473c3d4b8b26a98d162f9948fd2d10f1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ba9c554e791473c5c436d13fdcf6747945d786c0")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdventUtilities")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdventUtilities")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

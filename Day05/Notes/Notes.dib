@@ -20,40 +20,76 @@ string[] manuals = input[(splitIndex + 1)..];
 
 #!csharp
 
+int totalPages = manuals.Sum(arr => arr.Length);
+int oddManuals = manuals.Count(arr => arr.Split(',').Length % 2 != 0);
+int evenManuals = manuals.Count(arr => arr.Split(',').Length % 2 == 0);
+
+// (oddManuals, evenManuals).Display();
+
+Dictionary<int, int> numberCount = manuals.Select(s => Array.ConvertAll(s.Split(','), int.Parse)).SelectMany(x => x).GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
+Dictionary<int, List<int>> numberIndices = [];
+
+foreach (var number in numberCount.Where(kvp => kvp.Value >= 68))
+{
+    Console.WriteLine(number);
+}
+
+int[] nums = numberCount.Where(kvp => kvp.Value >= 68).Select(kvp => kvp.Key).ToArray();
+
+var intManuals = manuals.Select(s => Array.ConvertAll(s.Split(','), int.Parse)).ToArray();
+foreach (var manual in intManuals)
+{
+    foreach (var num in nums)
+    {
+        int index = Array.IndexOf(manual, num);
+        if (index is not -1)
+        {
+            int arrIndex = Array.IndexOf(intManuals, manual);
+            numberIndices[num] = numberIndices.TryGetValue(num, out var storedList) ? [..storedList, arrIndex] : [arrIndex];
+        }
+    }
+}
+
+numberIndices.Display();
+
+#!csharp
+
 Dictionary<int, int> ruleCount = rules.SelectMany(arr => Array.ConvertAll(arr.Split('|'), int.Parse)).GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
 
 // ruleCount.Display();
 
 #!csharp
 
-string[] input =
-[
-"47|53",
-"97|13",
-"97|61",
-"97|47",
-"75|29",
-"61|13",
-"75|53",
-"29|13",
-"97|29",
-"53|29",
-"61|53",
-"97|53",
-"61|29",
-"47|13",
-"75|47",
-"97|75",
-"47|61",
-"75|61",
-"47|29",
-"75|13",
-"53|13",
-"",
-"75,47,61,53,29",
-"97,61,53,29,13",
-"75,29,13",
-"75,97,47,61,53",
-"61,13,29",
-"97,13,75,29,47"
-];
+List<int> numbers = [ 79, 15, 48, 61, 96, 91 ];
+Dictionary<int,List<int>> numberToStrings = [];
+for (int i = 0; i < intManuals.Length; i++)
+{
+    int[] elements = intManuals[i];
+    
+    foreach (var number in numbers)
+    {
+        if (elements.Contains(number))
+        {
+            numberToStrings[number] = numberToStrings.TryGetValue(number, out var cached) ? [..cached, i] : [i];
+        }
+    }
+}
+
+int minSharedStrings = int.MaxValue;
+int num1 = 0, num2 = 0;
+for (int i = 0; i < numbers.Count; i++)
+{
+    for (int j = i + 1; j < numbers.Count; j++)
+    {
+        var sharedStrings = numberToStrings[numbers[i]].Intersect(numberToStrings[numbers[j]]).Count();
+        
+        if (sharedStrings < minSharedStrings)
+        {
+            minSharedStrings = sharedStrings;
+            num1 = numbers[i];
+            num2 = numbers[j];
+        }
+    }
+
+    Console.WriteLine($"Numbers {num1} and {num2} share the least strings: {minSharedStrings}");
+}

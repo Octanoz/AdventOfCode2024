@@ -2,26 +2,15 @@ namespace Day05;
 
 public class PageGraph
 {
-    private readonly Dictionary<ushort, HashSet<ushort>> relationships = [];
+    private readonly Dictionary<int, HashSet<int>> relationships = [];
 
-    public void AddRelationship(ushort pageA, ushort pageB)
+    public void AddRelationship(int pageA, int pageB)
     {
-        if (!relationships.TryGetValue(pageA, out var storedSet))
-        {
-            storedSet = [];
-            relationships[pageA] = storedSet;
-        }
-        storedSet.Add(pageB);
-
-        if (!relationships.TryGetValue(pageB, out storedSet))
-        {
-            storedSet = [];
-            relationships[pageB] = storedSet;
-        }
-        storedSet.Add(pageA);
+        relationships[pageA] = relationships.TryGetValue(pageA, out var storedSet) ? [.. storedSet, pageB] : [pageB];
+        relationships[pageB] = relationships.TryGetValue(pageB, out storedSet) ? [.. storedSet, pageA] : [pageA];
     }
 
-    public bool ValidateManual(ReadOnlySpan<ushort> manual)
+    public bool ValidateManual(ReadOnlySpan<int> manual)
     {
         Console.WriteLine(manual.ToString());
 
@@ -34,7 +23,7 @@ public class PageGraph
                 continue;
             }
 
-            ReadOnlySpan<ushort> before = manual[..i];
+            ReadOnlySpan<int> before = manual[..i];
             if (before.Overlaps([.. connections]))
             {
                 Console.WriteLine($"Conflict found overlap before {manual[i]}");
@@ -42,7 +31,7 @@ public class PageGraph
                 return false;
             }
 
-            ReadOnlySpan<ushort> after = manual[(i + 1)..];
+            ReadOnlySpan<int> after = manual[(i + 1)..];
             if (after.Overlaps([.. connections]))
             {
                 Console.WriteLine($"Conflict found, overlap after {manual[i]}");
@@ -54,12 +43,36 @@ public class PageGraph
         return true;
     }
 
-    public void BuildGraph(IEnumerable<ushort[]> rules)
+    public void BuildGraph(IEnumerable<int[]> rules)
     {
         foreach (var rule in rules)
         {
-
             AddRelationship(rule[0], rule[1]);
         }
+    }
+
+    public PageTree BuildTree(int rootPage)
+    {
+        HashSet<int> visited = [rootPage];
+        Dictionary<int, List<int>> tree = [];
+        Queue<int> pageQueue = [];
+
+        pageQueue.Enqueue(rootPage);
+        while (pageQueue.Count is not 0)
+        {
+            var current = pageQueue.Dequeue();
+            tree[current] = tree.TryGetValue(current, out var cached) ? cached : [];
+
+            foreach (var neighbour in relationships[current])
+            {
+                if (visited.Add(neighbour))
+                {
+                    tree[current].Add(neighbour);
+                    pageQueue.Enqueue(neighbour);
+                }
+            }
+        }
+
+        return tree;
     }
 }
