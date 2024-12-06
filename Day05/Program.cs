@@ -8,7 +8,7 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day05/input.txt")
 };
 
-string[] input = File.ReadAllLines(filePaths["challenge"]);
+string[] input = File.ReadAllLines(filePaths["example1"]);
 OrderValidator ov = new();
 
 Console.WriteLine(ov.PartOne(input));
