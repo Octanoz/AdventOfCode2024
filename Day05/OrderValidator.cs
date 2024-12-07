@@ -1,21 +1,56 @@
 namespace Day05;
 
-public class OrderValidator
+public class OrderValidator(string[] input)
 {
-    private static Dictionary<int, Page> pageMap = [];
-    private static List<Page> validMiddlePages = [];
+    private static readonly List<int> validMiddlePages = [];
 
-    public int PartOne(string[] input)
+    private static Page root = new(71);
+
+    public int PartOne()
     {
         int splitIndex = Array.FindIndex(input, s => s == "");
-        string[] rules = input[..splitIndex];
+        var rules = input[..splitIndex].Select(s => Array.ConvertAll(s.Split('|'), int.Parse));
         string[] manuals = input[(splitIndex + 1)..];
 
+        SetRoot(rules, manuals);
+        SeedRootBranches(rules);
         PopulatePages(rules);
-
         ValidateManuals(manuals);
 
-        return validMiddlePages.Sum(p => p.Id);
+        return validMiddlePages.Sum();
+    }
+
+    private void SeedRootBranches(IEnumerable<int[]> rules)
+    {
+        foreach (var rule in rules.Where(arr => arr[0] == root.Id || arr[1] == root.Id))
+        {
+            root.ProcessSeedRule(rule);
+        }
+    }
+
+    private static void SetRoot(IEnumerable<int[]> rules, string[] manuals)
+    {
+        Dictionary<int, int> beforeCounts = rules.SelectMany(x => new[] { (x[0], 1), (x[1], -1) })
+                                                 .GroupBy(x => x.Item1)
+                                                 .ToDictionary(g => g.Key, g => g.Sum(x => x.Item2));
+
+        if (beforeCounts.Values.Any(s => s > 0))
+        {
+            root = new(beforeCounts.MaxBy(kvp => kvp.Value).Key);
+            return;
+        }
+
+        foreach (var num in manuals.SelectMany(s => Array.ConvertAll(s.Split(','), int.Parse)))
+        {
+            beforeCounts[num]++;
+        }
+
+        root = new(beforeCounts.MaxBy(kvp => kvp.Value).Key);
+
+        if (root.Id is not 71)
+        {
+            Console.WriteLine($"root ID is {root.Id} not the hard-coded 71");
+        }
     }
 
     private static void ValidateManuals(string[] manuals)
@@ -26,13 +61,8 @@ public class OrderValidator
             if (!CompliantAfter(manualPages) || !CompliantBefore(manualPages))
                 continue;
 
-            int middleIndex = manualPages.Length / 2;
-            if (!pageMap.TryGetValue(manualPages[middleIndex], out Page? middle))
-            {
-                throw new ArgumentException($"Couldn't find a middle page with id {manualPages[middleIndex]}. Check PopulatePages logic.");
-            }
-
-            validMiddlePages.Add(middle);
+            int middle = manualPages.Length / 2; //All manuals have an odd amount of pages
+            validMiddlePages.Add(manualPages[middle]);
         }
     }
 
@@ -40,11 +70,6 @@ public class OrderValidator
     {
         for (int i = 1; i < manualPages.Length; i++)
         {
-            if (!pageMap.TryGetValue(manualPages[i], out Page? current))
-            {
-                throw new ArgumentException($"Couldn't find a page with id {manualPages[i]}. Check PopulatePages logic.");
-            }
-
             ReadOnlySpan<int> beforeSpan = manualPages.AsSpan()[..i];
             ReadOnlySpan<int> storedIds = current.After.Select(p => p.Id).ToArray();
             if (beforeSpan.ContainsAny(storedIds))
@@ -76,78 +101,22 @@ public class OrderValidator
         return true;
     }
 
-    private static void PopulatePages(string[] rulesStrings)
+    private static void PopulatePages(IEnumerable<int[]> rulesSequence)
     {
-        int[][] rules = rulesStrings.Select(s => Array.ConvertAll(s.Split('|'), int.Parse)).ToArray();
-
-        Console.WriteLine($"{rules.Length} rules for {pageMap.Count} stored pages");
-
-
-        Dictionary<int, int> ruleCount = rules.SelectMany(arr => arr)
-                                              .GroupBy(x => x)
-                                              .ToDictionary(g => g.Key, g => g.Count());
-
-        Queue<Page> pageQueue = CycleRules(rules, ruleCount);
-        Console.WriteLine($"{pageMap.Count} pages currently stored");
-        int queueCounter = 1;
-
-        while (pageQueue.Count is not 0)
+        HashSet<int> storedSet = new(root.GetStoredPages());
+        foreach (var rule in rulesSequence.Where(r => storedSet.Contains(r[0]) || storedSet.Contains(r[1])))
         {
-            var current = pageQueue.Dequeue();
-            int storedBefore = current.GetTotalStored();
-            foreach (var rule in rules.Where(r => r.Contains(current.Id)))
-            {
-                Page other = current.Id == rule[0] ? pageMap[rule[1]] : pageMap[rule[0]];
-
-                if (current.Id == rule[0])
-                {
-                    current.AddAfter(other, []);
-                }
-                else current.AddBefore(other, []);
-            }
-
-            if (storedBefore < current.GetTotalStored())
-            {
-                if (++queueCounter % 1000 == 0)
-                {
-                    Console.WriteLine($"Queue'ed {queueCounter} pages.\nCurrent page had {storedBefore} pages store, this grew to {current.GetTotalStored()}");
-                }
-                pageQueue.Enqueue(current);
-            }
+            root.ProcessRules(rule);
         }
+
+        CorrectOrderStoredPages(storedSet, rulesSequence);
     }
 
-    private static Queue<Page> CycleRules(int[][] rules, Dictionary<int, int> ruleCount)
+    private static void CorrectOrderStoredPages(HashSet<int> storedSet, IEnumerable<int[]> rules)
     {
-        Queue<Page> queue = [];
-        foreach (var rule in rules)
+        foreach (var rule in rules.Where(r => storedSet.Contains(r[0]) && storedSet.Contains(r[1])))
         {
-            if (!pageMap.TryGetValue(rule[0], out var first))
-            {
-                pageMap[rule[0]] = new(rule[0]);
-                first = pageMap[rule[0]];
-            }
-
-            if (!pageMap.TryGetValue(rule[1], out var second))
-            {
-                pageMap[rule[1]] = new(rule[1]);
-                second = pageMap[rule[1]];
-            }
-
-            first.AddAfter(second, []);
-            second.AddBefore(first, []);
-
-            if (--ruleCount[first.Id] is 0)
-            {
-                queue.Enqueue(first);
-            }
-
-            if (--ruleCount[second.Id] is 0)
-            {
-                queue.Enqueue(second);
-            }
+            root.CorrectSorting(rule);
         }
-
-        return queue;
     }
 }

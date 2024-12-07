@@ -4,37 +4,9 @@
 
 #!csharp
 
-string[] input =
-[
-"47|53",
-"97|13",
-"97|61",
-"97|47",
-"75|29",
-"61|13",
-"75|53",
-"29|13",
-"97|29",
-"53|29",
-"61|53",
-"97|53",
-"61|29",
-"47|13",
-"75|47",
-"97|75",
-"47|61",
-"75|61",
-"47|29",
-"75|13",
-"53|13",
-"",
-"75,47,61,53,29",
-"97,61,53,29,13",
-"75,29,13",
-"75,97,47,61,53",
-"61,13,29",
-"97,13,75,29,47"
-];
+using System.IO;
+
+string[] input = File.ReadAllLines(@"..\input.txt");
 
 #!csharp
 
@@ -44,39 +16,48 @@ string[] manuals = input[(splitIndex + 1)..];
 
 #!csharp
 
-rules.Display();
-manuals.Display();
+int pages = rules.SelectMany(s => Array.ConvertAll(s.Split('|'), int.Parse)).GroupBy(x => x).ToLookup(g => g.Key, g => g.Count()).Count;
 
-#!csharp
-
-public class Node(int id)
-{
-    public int Id {get;} = id;
-    public int Counter { get; set; } = 0;
-}
-
-Dictionary<int, Node> dict = new()
-{
-    [1] = new(1),
-    [2] = new(2),
-    [3] = new(3),
-};
-
-int[] ids = [1, 4, 2, 1, 4, 2];
-foreach (var id in ids)
-{
-    // Node current = dict.TryGetValue(id, out var f) ? f : dict[id] = new(id);
-    if (!dict.TryGetValue(id, out var current))
-    {
-        current = dict[id] = new(id);
-    }
-    current.Counter++;
-    current.Display();
-    System.Threading.Thread.Sleep(1000);
-}
+pages.Display();
 
 #!csharp
 
 Dictionary<int, int> ruleCount = rules.SelectMany(arr => Array.ConvertAll(arr.Split('|'), int.Parse)).GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
 
 ruleCount.Display();
+
+#!csharp
+
+Dictionary<int, int> beforeCounts = rules.Select(s => Array.ConvertAll(s.Split('|'), int.Parse))
+                                         .SelectMany(x => new[] { (x[0], 1), (x[1], -1) })
+                                         .GroupBy(x => x.Item1)
+                                         .ToDictionary(g => g.Key, g => g.Sum(x => x.Item2));
+
+beforeCounts.Display();
+
+#!csharp
+
+#!import Page.csx
+
+int[] frequency = new int[100];
+foreach (var num in manuals.SelectMany(s => Array.ConvertAll(s.Split(','), int.Parse)))
+{
+    frequency[num]++;
+}
+
+int[] top3 = frequency.OrderByDescending(x => x).Select(x => Array.IndexOf(frequency, x)).Take(10).ToArray();
+int[] results = [frequency[79], frequency[48], frequency[15], frequency[12], frequency[27]];
+top3.Display();
+results.Display();
+
+Page root = new(frequency.Max());
+var rulesArray = rules.Select(s => Array.ConvertAll(s.Split('|'), int.Parse));
+var rootRules = rulesArray.Where(arr => Array.FindIndex(arr, r => r == root.Id) is 0 or 1).ToArray();
+
+var something = Console.In.
+
+root.Display();
+// rootRules.Display();
+
+// root.Display();
+// root.Before.Display()
