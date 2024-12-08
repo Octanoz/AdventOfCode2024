@@ -2,7 +2,9 @@ using System.Collections;
 
 namespace Day05;
 
-public record Page(int Id)
+public record Page(int Id);
+
+public record PageFull(int Id)
 {
     private readonly BitArray stored = new(100);
     public List<int> Before { get; private set; } = [];

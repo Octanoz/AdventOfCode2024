@@ -12,7 +12,7 @@ public class Day05Tests
     {
         //Arrange
         string[] input = File.ReadAllLines(testPath);
-        OrderValidator sut = new();
+        OrderValidator sut = ();
 
         //Act
         int result = sut.PartOne(input);

@@ -30,6 +30,19 @@ public static class Solver
         return total;
     }
 
+    public static int OneAlt(string[] input)
+    {
+        var (left, right) = input.Select(s => Array.ConvertAll(s.Split("   "), int.Parse))
+        .Aggregate((l: new List<int>(), r: new List<int>()), (acc, x) =>
+        {
+            acc.l.Add(x[0]);
+            acc.r.Add(x[1]);
+            return acc;
+        });
+
+        return left.Order().Zip(right.Order(), (l, r) => Math.Abs(l - r)).Sum();
+    }
+
     public static int PartTwo(ReadOnlySpan<string> input)
     {
         Span<int> list1 = stackalloc int[input.Length];
@@ -56,23 +69,13 @@ public static class Solver
 
     }
 
-    public static int Alternative(string filePath)
+    public static int TwoAlt(string filePath)
     {
-#if DEBUG
-        string debugInput = File.ReadAllText(filePath);
-#endif
-
         int[] input = Array.ConvertAll(Regex.Split(File.ReadAllText(filePath), @"(\s+|\r\n)").Where(s => !String.IsNullOrWhiteSpace(s)).ToArray(), int.Parse);
 
-        Span<int> list1 = input.Where((s, i) => i % 2 == 0).ToArray();
-        Span<int> list2 = input.Where((s, i) => i % 2 != 0).ToArray();
+        HashSet<int> list1 = input.Where((s, i) => i % 2 == 0).ToHashSet();
+        int[] list2 = input.Where((s, i) => i % 2 != 0).ToArray();
 
-        int total = 0;
-        foreach (var number in list1)
-        {
-            total += number * list2.Count(number);
-        }
-
-        return total;
+        return list2.Where(list1.Contains).Sum();
     }
 }

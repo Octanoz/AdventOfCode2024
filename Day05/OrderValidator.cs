@@ -4,7 +4,7 @@ public class OrderValidator(string[] input)
 {
     private static readonly List<int> validMiddlePages = [];
 
-    private static Page root = new(71);
+    private static PageFull root = new(71);
 
     public int PartOne()
     {
@@ -20,7 +20,7 @@ public class OrderValidator(string[] input)
         return validMiddlePages.Sum();
     }
 
-    private void SeedRootBranches(IEnumerable<int[]> rules)
+    private static void SeedRootBranches(IEnumerable<int[]> rules)
     {
         foreach (var rule in rules.Where(arr => arr[0] == root.Id || arr[1] == root.Id))
         {
@@ -68,42 +68,17 @@ public class OrderValidator(string[] input)
 
     private static bool CompliantBefore(int[] manualPages)
     {
-        for (int i = 1; i < manualPages.Length; i++)
-        {
-            ReadOnlySpan<int> beforeSpan = manualPages.AsSpan()[..i];
-            ReadOnlySpan<int> storedIds = current.After.Select(p => p.Id).ToArray();
-            if (beforeSpan.ContainsAny(storedIds))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        throw new NotImplementedException();
     }
 
     private static bool CompliantAfter(int[] manualPages)
     {
-        for (int i = 0; i < manualPages.Length - 1; i++)
-        {
-            if (!pageMap.TryGetValue(manualPages[i], out Page? current))
-            {
-                throw new ArgumentException($"Couldn't find a page with id {manualPages[i]}. Check PopulatePages logic.");
-            }
-
-            ReadOnlySpan<int> afterSpan = manualPages.AsSpan()[(i + 1)..];
-            ReadOnlySpan<int> storedIds = current.Before.Select(p => p.Id).ToArray();
-            if (afterSpan.ContainsAny(storedIds))
-            {
-                return false;
-            }
-        }
-
-        return true;
+        throw new NotImplementedException();
     }
 
     private static void PopulatePages(IEnumerable<int[]> rulesSequence)
     {
-        HashSet<int> storedSet = new(root.GetStoredPages());
+        HashSet<int> storedSet = [.. root.GetStoredPages()];
         foreach (var rule in rulesSequence.Where(r => storedSet.Contains(r[0]) || storedSet.Contains(r[1])))
         {
             root.ProcessRules(rule);
