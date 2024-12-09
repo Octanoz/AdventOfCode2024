@@ -4,8 +4,8 @@ namespace Day4.Tests;
 
 public class Day04Tests
 {
-    private readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day4/example1.txt");
-    private readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day4/input.txt");
+    private readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day04/example1.txt");
+    private readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day04/input.txt");
 
     [Fact]
     public void WordFinder_FindTarget_TestData_Should_Return_18()

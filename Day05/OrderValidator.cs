@@ -2,67 +2,125 @@ using System.Data;
 
 namespace Day05;
 
-public class OrderValidator
+public class OrderValidator(string[] input)
 {
-    private static readonly List<int> middleIds = [];
+    private static OrderedDictionary<int, Page> pageMap = [];
+    private static readonly List<int> validMiddlePages = [];
+    private static readonly List<int[]> invalidManuals = [];
 
-    public int PartOne(string[] input)
+    public int Process(bool isPartTwo = false)
     {
         int splitIndex = Array.FindIndex(input, s => s == "");
         var rules = input[..splitIndex].Select(s => Array.ConvertAll(s.Split('|'), int.Parse));
-        ReadOnlySpan<string> manuals = input.AsSpan()[(splitIndex + 1)..];
+        var manuals = input[(splitIndex + 1)..].Select(s => Array.ConvertAll(s.Split(','), int.Parse));
 
+        PopulateBranches(rules);
+        ValidateManuals(manuals, isPartTwo);
 
-        PageGraph graph = new();
-        graph.BuildGraph(rules);
-
-        int[] roots = [79, 96];
-        Dictionary<int, PageTree> trees = [];
-
-        foreach (var root in roots)
+        if (isPartTwo)
         {
-            trees[root] = graph.BuildTree(root);
+            FixOrder(invalidManuals, rules);
         }
 
-        foreach (var manual in manuals)
-        {
-            var manualPages = Array.ConvertAll(manual.Split(','), int.Parse).AsSpan();
-            if (ValidateWithTrees(manualPages, trees))
-            {
-                int middleIndex = manualPages.Length / 2;
-                middleIds.Add(manualPages[middleIndex]);
-            }
-        }
-
-        return middleIds.Sum();
+        return validMiddlePages.Sum();
     }
 
-    private static bool ValidateWithTrees(ReadOnlySpan<int> manual, Dictionary<int, Dictionary<int, List<int>>> trees)
+    private static void PopulateBranches(IEnumerable<int[]> rules)
     {
-        for (int i = 0; i < manual.Length; i++)
+        foreach (var rule in rules)
         {
-            var current = manual[i];
-            bool isValid = false;
-
-            foreach (var tree in trees.Values.Where(d => d.ContainsKey(current)))
+            if (!pageMap.TryGetValue(rule[0], out var firstPage))
             {
-                var beforePages = manual[..i];
-                var afterPages = manual[(i + 1)..];
-
-                if (!beforePages.ContainsAny([.. tree[current]])
-                && !afterPages.ContainsAny([.. tree[current]]))
-                {
-                    isValid = true;
-                    break;
-                }
+                firstPage = new(rule[0]);
+                pageMap[rule[0]] = firstPage;
             }
 
-            if (!isValid)
+            if (!pageMap.TryGetValue(rule[1], out var secondPage))
             {
-                return false;
+                secondPage = new(rule[1]);
+                pageMap[rule[1]] = secondPage;
+            }
+
+            Update(firstPage, secondPage);
+        }
+    }
+
+    static void Update(Page a, Page b)
+    {
+        a.AddAfter(b.Id);
+        b.AddBefore(a.Id);
+    }
+
+    private static void ValidateManuals(IEnumerable<int[]> manuals, bool isPartTwo = false)
+    {
+        foreach (var manual in manuals)
+        {
+            bool isValid = true;
+            int index = 0;
+            while (isValid && index < manual.Length)
+            {
+                Page current = pageMap[manual[index]];
+
+                Span<int> beforeSpan = manual.AsSpan()[..index];
+                Span<int> afterSpan = manual.AsSpan()[(index + 1)..];
+
+                if (beforeSpan.ContainsAny(current.After.ToArray()))
+                {
+                    isValid = false;
+                }
+
+                if (afterSpan.ContainsAny(current.Before.ToArray()))
+                {
+                    isValid = false;
+                }
+
+                index++;
+            }
+
+            if (!isPartTwo && isValid)
+            {
+                int middle = manual.Length / 2;
+                validMiddlePages.Add(manual[middle]);
+            }
+            else if (isPartTwo && !isValid)
+            {
+                invalidManuals.Add(manual);
             }
         }
+    }
 
-        return true;
+    private static void FixOrder(List<int[]> invalidManuals, IEnumerable<int[]> rules)
+    {
+        foreach (var currentList in invalidManuals.Select(arr => arr.ToList()))
+        {
+            bool changed;
+
+            do
+            {
+                changed = false;
+
+                foreach (var rule in rules.Where(r => currentList.Contains(r[0]) && currentList.Contains(r[1])))
+                {
+                    int beforeIndex = currentList.IndexOf(rule[0]);
+                    int afterIndex = currentList.IndexOf(rule[1]);
+
+                    if (beforeIndex > afterIndex)
+                    {
+                        currentList.RemoveAt(afterIndex);
+
+                        if (beforeIndex == currentList.Count)
+                        {
+                            currentList.Add(rule[1]);
+                        }
+                        else currentList.Insert(beforeIndex, rule[1]);
+
+                        changed = true;
+                    }
+                }
+            } while (changed);
+
+            int middle = currentList.Count / 2;
+            validMiddlePages.Add(currentList[middle]);
+        }
     }
 }

@@ -5,8 +5,8 @@ using AdventUtilities;
 
 public class Day02Tests
 {
-    private static readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day2/example1.txt");
-    private static readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day2/input.txt");
+    private static readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day02/example1.txt");
+    private static readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day02/input.txt");
 
     [Fact]
     public void ReportReader_PartOne_TestData_Should_Return_2()
