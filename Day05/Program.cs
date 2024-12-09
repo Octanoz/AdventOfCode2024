@@ -9,7 +9,6 @@ Dictionary<string, string> filePaths = new()
 };
 
 string[] input = File.ReadAllLines(filePaths["challenge"]);
-OrderValidator ov = new();
+OrderValidator ov = new(input);
 
-Console.WriteLine(ov.PartOne(input));
-
+Console.WriteLine(ov.Process(true));

@@ -6,9 +6,9 @@ using AdventUtilities;
 
 public class Day03Tests
 {
-    private static readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day3/example1.txt");
-    private static readonly string testPath2 = Path.Combine(InputData.GetSolutionDirectory(), "Day3/example2.txt");
-    private static readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day3/input.txt");
+    private static readonly string testPath = Path.Combine(InputData.GetSolutionDirectory(), "Day03/example1.txt");
+    private static readonly string testPath2 = Path.Combine(InputData.GetSolutionDirectory(), "Day03/example2.txt");
+    private static readonly string puzzlePath = Path.Combine(InputData.GetSolutionDirectory(), "Day03/input.txt");
 
     [Fact]
     public void Scanner_PartOne_TestData_Should_Return_161()

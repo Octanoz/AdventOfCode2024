@@ -1,11 +1,11 @@
 namespace Day05;
 
-public class Validator
+public static class Validator
 {
     private static OrderedDictionary<int, Page> pageMap = new(49);
     private static List<Page> validMiddlePages = [];
     private static int root = 71;
-    public int PartOne(string[] input)
+    public static int PartOne(string[] input)
     {
         int splitIndex = Array.FindIndex(input, s => s == "");
         var rules = input[..splitIndex].Select(s => Array.ConvertAll(s.Split('|'), int.Parse)); ;
@@ -15,7 +15,7 @@ public class Validator
         SeedDictionary(rules);
         PopulatePages(rules);
         ValidateManuals(manuals);
-        return validMiddlePages.Sum(p => p.Id);
+        return checked(validMiddlePages.Sum(p => p.Id));
     }
 
     private static void SetRoot(IEnumerable<int[]> rules, string[] manuals)
@@ -46,62 +46,65 @@ public class Validator
 
     private static void SeedDictionary(IEnumerable<int[]> rules)
     {
-        pageMap.SetAt(24, root, new(root));
-
+        pageMap.Add(root, new(root));
         foreach (var rule in rules.Where(arr => arr[0] == root || arr[1] == root))
         {
-            switch (Array.FindIndex(rule, r => r == root))
+            switch (Array.IndexOf(rule, root))
             {
                 case 0:
-                    pageMap.SetAt(25, rule[1], new(rule[1]));
+                    pageMap.Add(rule[1], new(rule[1]));
                     break;
                 case 1:
-                    pageMap.SetAt(23, rule[0], new(rule[0]));
+                    pageMap.Insert(0, rule[0], new(rule[0]));
                     break;
             }
         }
+
+        CorrectSorting(rules);
     }
 
     private static void PopulatePages(IEnumerable<int[]> rules)
     {
-        int rootIndex = pageMap.IndexOf(root);
-        CorrectSorting(rules);
-        while (pageMap.Count < pageMap.Capacity)
+        int pageCount = CountPages(rules);
+        while (pageMap.Count < pageCount)
         {
-            Span<int[]> filteredRules = FilterRules(rules);
+            int[][] filteredRules = FilterRules(rules);
             foreach (var rule in filteredRules)
             {
                 ApplyRule(rule);
             }
-            int storedBefore = current.GetTotalStored();
-            foreach (var rule in rules.Where(r => r.Contains(current.Id)))
-            {
-                Page other = current.Id == rule[0] ? pageMap[rule[1]] : pageMap[rule[0]];
-                if (current.Id == rule[0])
-                {
-                    current.AddAfter(other, []);
-                }
-                else current.AddBefore(other, []);
-            }
-            if (storedBefore < current.GetTotalStored())
-            {
-                if (++queueCounter % 1000 == 0)
-                {
-                    Console.WriteLine($"Queue'ed {queueCounter} pages.\nCurrent page had {storedBefore} pages store, this grew to {current.GetTotalStored()}");
-                }
-                pageQueue.Enqueue(current);
-            }
+
+            CorrectSorting(rules);
         }
     }
 
+    private static int CountPages(IEnumerable<int[]> rules) => rules.SelectMany(arr => arr)
+                                                                    .GroupBy(x => x)
+                                                                    .ToLookup(g => g.Key, g => g.Count()).Count;
+
     private static void ApplyRule(int[] rule)
     {
-        throw new NotImplementedException();
+        switch (pageMap.IndexOf(rule[0]), pageMap.IndexOf(rule[1]))
+        {
+            case (-1, var num):
+                pageMap.Insert(num is 0 ? num : num - 1, rule[0], new(rule[0]));
+                break;
+            case (var num, -1):
+                if (num == pageMap.Count - 1)
+                {
+                    pageMap.Add(rule[1], new(rule[1]));
+                }
+                else pageMap.Insert(num, rule[1], new(rule[1]));
+                break;
+            default: break;
+        }
     }
 
     private static int[][] FilterRules(IEnumerable<int[]> rules)
     {
-        return rules.Where(r => pageMap.ContainsKey(r[0]) || pageMap.ContainsKey(r[1])).ToArray();
+        return rules.Where(r => pageMap.ContainsKey(r[0]) && !pageMap.ContainsKey(r[1])
+                             || (pageMap.ContainsKey(r[1]) && !pageMap.ContainsKey(r[0])))
+                    .ToArray();
     }
 
     private static void CorrectSorting(IEnumerable<int[]> rules)
@@ -114,59 +117,42 @@ public class Validator
             if (beforeIndex > afterIndex)
             {
                 pageMap.RemoveAt(afterIndex);
-                pageMap.SetAt(beforeIndex, rule[1], new(rule[1]));
+
+                if (beforeIndex == pageMap.Count)
+                {
+                    pageMap.Add(rule[1], new(rule[1]));
+                }
+                else pageMap.Insert(beforeIndex, rule[1], new(rule[1]));
             }
         }
     }
 
     private static void ValidateManuals(string[] manuals)
     {
-        foreach (var manual in manuals)
+        foreach (var manual in manuals.Select(s => Array.ConvertAll(s.Split(','), int.Parse)))
         {
-            int[] manualPages = Array.ConvertAll(manual.Split(','), int.Parse);
-            if (!CompliantAfter(manualPages) || !CompliantBefore(manualPages))
-                continue;
-            int middleIndex = manualPages.Length / 2;
-            if (!pageMap.TryGetValue(manualPages[middleIndex], out Page? middle))
+            bool isValid = true;
+            int currentIndex = -1;
+            for (int i = 0; i < manual.Length; i++)
             {
-                throw new ArgumentException($"Couldn't find a middle page with id {manualPages[middleIndex]}. Check PopulatePages logic.");
+                int index = pageMap.IndexOf(manual[i]);
+                if (index > currentIndex)
+                {
+                    currentIndex = index;
+                }
+                else
+                {
+                    isValid = false;
+                    break;
+                }
             }
-            validMiddlePages.Add(middle);
-        }
-    }
-    private static bool CompliantBefore(int[] manualPages)
-    {
-        for (int i = 1; i < manualPages.Length; i++)
-        {
-            if (!pageMap.TryGetValue(manualPages[i], out Page? current))
+
+            if (isValid)
             {
-                throw new ArgumentException($"Couldn't find a page with id {manualPages[i]}. Check PopulatePages logic.");
-            }
-            ReadOnlySpan<int> beforeSpan = manualPages.AsSpan()[..i];
-            ReadOnlySpan<int> storedIds = current.After.Select(p => p.Id).ToArray();
-            if (beforeSpan.ContainsAny(storedIds))
-            {
-                return false;
+                int middle = manual.Length / 2;
+                validMiddlePages.Add(new(manual[middle]));
             }
         }
-        return true;
-    }
-    private static bool CompliantAfter(int[] manualPages)
-    {
-        for (int i = 0; i < manualPages.Length - 1; i++)
-        {
-            if (!pageMap.TryGetValue(manualPages[i], out Page? current))
-            {
-                throw new ArgumentException($"Couldn't find a page with id {manualPages[i]}. Check PopulatePages logic.");
-            }
-            ReadOnlySpan<int> afterSpan = manualPages.AsSpan()[(i + 1)..];
-            ReadOnlySpan<int> storedIds = current.Before.Select(p => p.Id).ToArray();
-            if (afterSpan.ContainsAny(storedIds))
-            {
-                return false;
-            }
-        }
-        return true;
     }
 }
 

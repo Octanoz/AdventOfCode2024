@@ -38,7 +38,7 @@ public class Day01Tests
     public void AlternativeTwo_Should_Return_31()
     {
         //Arrange
-        string filePath = Path.Combine(InputData.GetSolutionDirectory(), "Day1/Example1.txt");
+        string filePath = Path.Combine(InputData.GetSolutionDirectory(), "Day01/example1.txt");
 
         //Act
         int result = Solver.Alternative(filePath);

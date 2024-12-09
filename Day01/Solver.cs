@@ -69,13 +69,19 @@ public static class Solver
 
     }
 
-    public static int TwoAlt(string filePath)
+    public static int Alternative(string filePath)
     {
         int[] input = Array.ConvertAll(Regex.Split(File.ReadAllText(filePath), @"(\s+|\r\n)").Where(s => !String.IsNullOrWhiteSpace(s)).ToArray(), int.Parse);
 
-        HashSet<int> list1 = input.Where((s, i) => i % 2 == 0).ToHashSet();
-        int[] list2 = input.Where((s, i) => i % 2 != 0).ToArray();
+        Span<int> list1 = input.Where((s, i) => i % 2 == 0).ToArray();
+        Span<int> list2 = input.Where((s, i) => i % 2 != 0).ToArray();
 
-        return list2.Where(list1.Contains).Sum();
+        int total = 0;
+        foreach (var number in list1)
+        {
+            total += number * list2.Count(number);
+        }
+
+        return total;
     }
 }
