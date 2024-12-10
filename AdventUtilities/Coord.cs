@@ -5,11 +5,11 @@ public record Coord(int Row, int Col)
     public static Coord Zero => new(0, 0);
 
     public Coord Up => new(Row - 1, Col);
+    public Coord Right => new(Row, Col + 1);
     public Coord Down => new(Row + 1, Col);
     public Coord Left => new(Row, Col - 1);
-    public Coord Right => new(Row, Col + 1);
 
-    public IEnumerable<Coord> Neighbours => [Up, Down, Left, Right];
+    public IEnumerable<Coord> Neighbours => [Up, Right, Down, Left];
 
     public static Coord operator +(Coord a, Coord b) => new(a.Row + b.Row, a.Col + b.Col);
     public static Coord operator -(Coord a, Coord b) => new(a.Row - b.Row, a.Col - b.Col);

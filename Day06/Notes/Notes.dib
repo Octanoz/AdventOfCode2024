@@ -1,0 +1,109 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+public enum Direction
+{
+  Up,
+  Right,
+  Down,
+  Left
+}
+
+#!csharp
+
+Direction dir = new();
+
+for (int i = 0; i < 10; i++)
+{
+    Console.WriteLine((Direction)((int)(dir += i) % 4));
+}
+
+#!csharp
+
+// Span<Coord> freeSpaces = map.Index().SelectMany(row => row.Item.Index().Where(col => col.Item is '.').Select(col => new Coord(row.Index, col.Index))).ToArray();
+
+        // foreach (var coord in freeSpaces[..5])
+        // {
+        //     File.AppendAllText(@"Notes/test.txt", $"{coord} ");
+        // }
+
+        // int chunkSize = 9;
+        // Define the size of each chunk 
+        // using (StreamWriter writer = new(@"Notes/test.txt"))
+        // {
+        //     for (int i = 0; i < freeSpaces.Length; i += chunkSize)
+        //     {
+        //         var chunk = freeSpaces.Slice(i, Math.Min(chunkSize, freeSpaces.Length - i));
+        //         writer.WriteLine(string.Join(" ", chunk.ToArray().AsEnumerable()));
+        //     }
+        // }
+
+#!csharp
+
+string[] stringMatrix =
+[
+"FOIJSDF",
+"DFGJIOD",
+"DFGJASD",
+"OPKJSRT"
+];
+
+char[][] matrix = stringMatrix.Select(s => s.ToCharArray()).ToArray();
+
+int currentRow = 1;
+int currentCol = 2;
+
+// var right = matrix.Take(currentRow).Select(row => row[currentCol]);
+var right = matrix.Skip(currentRow).Select(row => row[currentCol]);
+
+right.Display();
+
+#!csharp
+
+int[] numbersOriginal = [1,2,3,4];
+int[] newNumbers = new int[4];
+Array.Copy(numbersOriginal, newNumbers, 4);
+int[] anotherNumbers = (int[])numbersOriginal.Clone();
+int[] fourthNumbers = numbersOriginal;
+
+newNumbers[1] *= 8;
+anotherNumbers[3] -= 2;
+numbersOriginal[2] *= 10;
+
+numbersOriginal.Display();
+newNumbers.Display();
+anotherNumbers.Display();
+fourthNumbers.Display();
+
+#!csharp
+
+string[] coordinates =
+[
+"[1, 4]",
+"[1, 8]",
+"[6, 8]",
+"[6, 4]",
+"[1, 4]",
+"[1, 8]",
+"[6, 8]",
+"[6, 4]",
+"[1, 4]",
+"[1, 8]",
+"[6, 8]",
+"[6, 4]",
+"[1, 4]",
+"[1, 8]",
+"[6, 8]",
+"[6, 4]",
+"[1, 4]",
+"[1, 8]",
+"[6, 8]",
+"[6, 4]"
+];
+
+Dictionary<string, int> coordCount = coordinates.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
+
+coordCount.Display();
