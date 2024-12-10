@@ -69,7 +69,7 @@ public class Tracker(string[] input)
                     {
                         cornerCount[current] = cornerCount.TryGetValue(current, out var counter) ? counter + 1 : 1;
 
-                        if (cornerCount.Values.Count(c => c >= 4) >= 4)
+                        if (cornerCount.Values.Count(c => c >= 6) >= 4)
                         {
                             winners.Add(rock);
                             break;
