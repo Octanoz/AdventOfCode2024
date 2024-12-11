@@ -8,8 +8,8 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day07/input.txt")
 };
 
-OperatorStack opStack = new();
+
 string[] input = File.ReadAllLines(filePaths["challenge"]);
-long result = opStack.PartOne(input);
+long result = OperatorStack.ValidateEquations(input);
 
 Console.WriteLine(result);
