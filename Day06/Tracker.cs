@@ -1,14 +1,12 @@
 
 namespace Day06;
 
-using System.Diagnostics;
 using AdventUtilities;
 
 
 public class Tracker(string[] input)
 {
     private readonly string[] input = input;
-    private static readonly Queue<Coord> loopQueue = [];
 
     const char Guard = 'G';
     const char North = '^', East = '>', South = 'v', West = '<', Obstacle = '#', Inserted = 'O', Open = '.';
@@ -16,107 +14,67 @@ public class Tracker(string[] input)
     public int PartOne()
     {
         Coord guard = GetGuardPosition(input);
-
         char[][] traversedMap = TraverseMap(input, guard);
 
-        return traversedMap.SelectMany(x => x).Count(c => c is North or East or South or West or Guard);
+        return traversedMap.SelectMany(x => x).Count(c => c is not Open and not Obstacle);
     }
 
-    public int PartTwo(string filePath)
-    {
-        Coord guard = GetGuardPosition(input);
-
-        List<Coord> potentialObstacles = ScanMap(input, guard);
-        List<Coord> validObstacles = FindValidObstacles(potentialObstacles, input, guard, filePath);
-
-        return validObstacles.Count;
-    }
-
-    private static List<Coord> FindValidObstacles(List<Coord> potentialObstacles, string[] input, Coord guard, string filePath)
-    {
-        List<Coord> winners = [];
-        int maxRow = input.Length;
-        int maxCol = input[0].Length;
-
-        foreach (var rock in potentialObstacles.Where(r => WithinBounds(r, maxRow, maxCol)))
-        {
-            Dictionary<Coord, int> cornerCount = [];
-            HashSet<Coord> visited = [];
-            Coord current = new(guard.Row, guard.Col);
-            char[][] map = GridExtensions.JaggedCharArray(File.ReadAllLines(filePath));
-
-            map[rock.Row][rock.Col] = Inserted;
-            map[current.Row][current.Col] = Guard;
-            Direction dir = new();
-
-            while (WithinBounds(current, maxRow, maxCol))
-            {
-                map[current.Row][current.Col] = dir switch
-                {
-                    _ when map[current.Row][current.Col] is Guard => Guard,
-                    _ when map[current.Row][current.Col] is not Open => '+',
-                    Direction.Up => North,
-                    Direction.Right => East,
-                    Direction.Down => South,
-                    _ => West,
-                };
-
-                Span<Coord> neighbourSpan = current.Neighbours.ToArray();
-                Coord nextCell = neighbourSpan[(int)dir];
-                if (WithinBounds(nextCell, maxRow, maxCol) && map[nextCell.Row][nextCell.Col] is Obstacle or Inserted)
-                {
-                    if (!visited.Add(current))
-                    {
-                        cornerCount[current] = cornerCount.TryGetValue(current, out var counter) ? counter + 1 : 1;
-
-                        if (cornerCount.Values.Count(c => c >= 6) >= 4)
-                        {
-                            winners.Add(rock);
-                            break;
-                        }
-                    }
-
-                    dir = TurnRight(dir);
-                }
-
-                current = dir switch
-                {
-                    Direction.Up => current.Up,
-                    Direction.Right => current.Right,
-                    Direction.Down => current.Down,
-                    _ => current.Left
-                };
-            }
-
-            map[rock.Row][rock.Col] = Open;
-        }
-
-        return winners;
-    }
-
-    private List<Coord> ScanMap(string[] input, Coord current)
+    private static char[][] TraverseMap(string[] input, Coord current)
     {
         int maxRow = input.Length;
         int maxCol = input[0].Length;
-        List<Coord> obstacleCoords = [];
-        char[][] map = input.Select(s => s.ToCharArray()).ToArray();
+        char[][] map = GridExtensions.JaggedCharArray(input);
         map[current.Row][current.Col] = Guard;
         Direction dir = new();
 
         while (WithinBounds(current, maxRow, maxCol))
         {
-            map[current.Row][current.Col] = dir switch
-            {
-                _ when map[current.Row][current.Col] is Guard => Guard,
-                _ when map[current.Row][current.Col] is not Open => '+',
-                Direction.Up => North,
-                Direction.Right => East,
-                Direction.Down => South,
-                _ => West,
-            };
+            MarkDirection(map, dir, current);
 
-            Span<Coord> neighbourSpan = current.Neighbours.ToArray();
-            Coord nextCell = neighbourSpan[(int)dir];
+            Coord nextCell = current.Neighbours.Skip((int)dir).First();
+            if (WithinBounds(nextCell, maxRow, maxCol) && map[nextCell.Row][nextCell.Col] is Obstacle or Inserted)
+            {
+                dir = TurnRight(dir);
+                continue;
+            }
+
+            current = current.Neighbours.Skip((int)dir).First();
+        }
+
+        return map;
+    }
+
+    public int PartTwo()
+    {
+        Coord guard = GetGuardPosition(input);
+
+        char[][] map = GridExtensions.JaggedCharArray(input);
+        List<Coord> potentialObstacles = ScanMap(map, guard);
+
+        int loops = 0;
+        foreach (var insert in potentialObstacles.Distinct())
+        {
+            if (CausesLoop((char[][])map.Clone(), guard, new(insert.Row, insert.Col)))
+            {
+                loops++;
+            }
+        }
+
+        return loops;
+    }
+
+    private static List<Coord> ScanMap(char[][] map, Coord current)
+    {
+        int maxRow = map.Length;
+        int maxCol = map[0].Length;
+
+        List<Coord> obstacleScenarios = [];
+        map[current.Row][current.Col] = Guard;
+        Direction dir = new();
+
+        while (WithinBounds(current, maxRow, maxCol))
+        {
+            Coord nextCell = current.Neighbours.Skip((int)dir).First();
             if (WithinBounds(nextCell, maxRow, maxCol) && map[nextCell.Row][nextCell.Col] is Obstacle or Inserted)
             {
                 dir = TurnRight(dir);
@@ -124,6 +82,8 @@ public class Tracker(string[] input)
             }
             else
             {
+                MarkDirection(map, dir, current);
+
                 Span<char> rightSpan = dir switch
                 {
                     Direction.Up when current.Col < maxCol - 1 => map[current.Row].AsSpan()[(current.Col + 1)..],
@@ -138,91 +98,91 @@ public class Tracker(string[] input)
                     _ => []
                 };
 
-                if (rightSpan.Contains(Obstacle) && WithinBounds(nextCell, maxRow, maxCol) && map[nextCell.Row][nextCell.Col] is not Obstacle)
+                if (rightSpan.Contains(Obstacle) && WithinBounds(nextCell, maxRow, maxCol) && CurrentChar(map, nextCell) is not Obstacle and not Guard)
                 {
-                    obstacleCoords.Add(dir switch
+                    Coord newObstacle = dir switch
                     {
                         Direction.Up => current.Up,
                         Direction.Right => current.Right,
                         Direction.Down => current.Down,
                         _ => current.Left
-                    });
+                    };
+
+                    obstacleScenarios.Add(newObstacle);
                 }
             }
 
-            current = dir switch
-            {
-                Direction.Up => current.Up,
-                Direction.Right => current.Right,
-                Direction.Down => current.Down,
-                _ => current.Left
-            };
+            current = current.Neighbours.Skip((int)dir).First();
         }
 
-        return obstacleCoords;
+        return obstacleScenarios;
     }
 
-    private static bool IsLoopDetected(Queue<Coord> recent, Dictionary<Coord, int> cornerCount, Coord current,
-                                        int windowSize, int cornerThreshold)
+    private static bool CausesLoop(char[][] currentMap, Coord guard, Coord insert)
     {
-        if (recent.Count == windowSize)
-            recent.Dequeue();
+        int maxRow = currentMap.Length;
+        int maxCol = currentMap[0].Length;
+        CleanMap(currentMap);
 
-        recent.Enqueue(current);
+        if (insert == guard)
+            return false;
 
-        cornerCount[current] = cornerCount.TryGetValue(current, out var counter) ? counter + 1 : 1;
+        HashSet<(Coord, Direction)> visited = [];
+        Coord current = new(guard.Row, guard.Col);
 
-        if (cornerCount.Values.Count(c => c >= cornerThreshold) >= cornerThreshold)
+        currentMap[insert.Row][insert.Col] = Inserted;
+        currentMap[current.Row][current.Col] = Guard;
+        Direction dir = new();
+
+        while (WithinBounds(current, maxRow, maxCol))
         {
-            int half = recent.Count / 2;
-            return recent.Count == windowSize && recent.Take(half).SequenceEqual(recent.Skip(half));
+            Coord nextCell = current.Neighbours.Skip((int)dir).First();
+            if (WithinBounds(nextCell, maxRow, maxCol) && currentMap[nextCell.Row][nextCell.Col] is Obstacle or Inserted)
+            {
+                if (!visited.Add((current, dir)))
+                {
+                    return true;
+                }
+
+                dir = TurnRight(dir);
+                continue;
+            }
+
+            MarkDirection(currentMap, dir, current);
+
+            current = current.Neighbours.Skip((int)dir).First();
         }
 
         return false;
     }
 
-
-
-    private char[][] TraverseMap(string[] input, Coord current)
+    private static void MarkDirection(char[][] map, Direction dir, Coord current) => map[current.Row][current.Col] = dir switch
     {
-        int maxRow = input.Length;
-        int maxCol = input[0].Length;
-        char[][] map = input.Select(s => s.ToCharArray()).ToArray();
-        map[current.Row][current.Col] = Guard;
-        Direction dir = new();
+        _ when CurrentChar(map, current) is Guard => Guard,
+        _ when CurrentChar(map, current) is not Open => '+',
+        Direction.Up => North,
+        Direction.Right => East,
+        Direction.Down => South,
+        _ => West,
+    };
 
-        while (WithinBounds(current, maxRow, maxCol))
+    private static void CleanMap(char[][] map)
+    {
+        Array.ForEach(map, arr =>
         {
-            map[current.Row][current.Col] = dir switch
+            for (int i = 0; i < arr.Length; i++)
             {
-                _ when map[current.Row][current.Col] is Guard => Guard,
-                Direction.Up => North,
-                Direction.Right => East,
-                Direction.Down => South,
-                _ => West,
-            };
-
-            Span<Coord> neighbourSpan = current.Neighbours.ToArray();
-            Coord nextCell = neighbourSpan[(int)dir];
-            if (WithinBounds(nextCell, maxRow, maxCol) && map[nextCell.Row][nextCell.Col] is Obstacle or Inserted)
-            {
-                dir = TurnRight(dir);
-                continue;
+                if (arr[i] is not Guard and not Obstacle)
+                {
+                    arr[i] = Open;
+                }
             }
-
-            current = dir switch
-            {
-                Direction.Up => current.Up,
-                Direction.Right => current.Right,
-                Direction.Down => current.Down,
-                _ => current.Left
-            };
-        }
-
-        // GridExtensions.DrawJaggedGridTight(map);
-
-        return map;
+        });
     }
+
+    private static Direction TurnRight(Direction dir) => (Direction)(((int)dir + 1) % 4);
+
+    private static char CurrentChar(char[][] map, Coord current) => map[current.Row][current.Col];
 
     private static Coord GetGuardPosition(ReadOnlySpan<string> input)
     {
@@ -237,7 +197,6 @@ public class Tracker(string[] input)
         return new(-1, -1);
     }
 
-    private static Direction TurnRight(Direction dir) => (Direction)(((int)dir + 1) % 4);
 
     static bool WithinBounds(Coord c, int maxRow, int maxCol) => c.Row >= 0 && c.Row < maxRow
                                                               && c.Col >= 0 && c.Col < maxCol;
@@ -250,3 +209,4 @@ public enum Direction
     Down,
     Left
 }
+

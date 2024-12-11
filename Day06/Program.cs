@@ -18,8 +18,7 @@ int result = tracker.PartOne();
 
 Console.WriteLine(result);
 #else
-//? 1872 was too high
-int result = tracker.PartTwo(filePaths["challenge"]);
+int result = tracker.PartTwo();
 
 Console.WriteLine(result);
 

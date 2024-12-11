@@ -23,26 +23,6 @@ for (int i = 0; i < 10; i++)
 
 #!csharp
 
-// Span<Coord> freeSpaces = map.Index().SelectMany(row => row.Item.Index().Where(col => col.Item is '.').Select(col => new Coord(row.Index, col.Index))).ToArray();
-
-        // foreach (var coord in freeSpaces[..5])
-        // {
-        //     File.AppendAllText(@"Notes/test.txt", $"{coord} ");
-        // }
-
-        // int chunkSize = 9;
-        // Define the size of each chunk 
-        // using (StreamWriter writer = new(@"Notes/test.txt"))
-        // {
-        //     for (int i = 0; i < freeSpaces.Length; i += chunkSize)
-        //     {
-        //         var chunk = freeSpaces.Slice(i, Math.Min(chunkSize, freeSpaces.Length - i));
-        //         writer.WriteLine(string.Join(" ", chunk.ToArray().AsEnumerable()));
-        //     }
-        // }
-
-#!csharp
-
 string[] stringMatrix =
 [
 "FOIJSDF",
@@ -55,11 +35,18 @@ char[][] matrix = stringMatrix.Select(s => s.ToCharArray()).ToArray();
 
 int currentRow = 1;
 int currentCol = 2;
+int bottomRow = 3;
 
-// var right = matrix.Take(currentRow).Select(row => row[currentCol]);
-var right = matrix.Skip(currentRow).Select(row => row[currentCol]);
+var top = matrix.Take(bottomRow).Select(row => row[currentCol]).ToArray();
+var bottom = matrix.Skip(currentRow + 1).Select(row => row[currentCol]);
+var right = matrix[currentRow][(currentCol + 1)..];
+var left = matrix[bottomRow][..currentCol];
 
+
+top.Display();
+bottom.Display();
 right.Display();
+left.Display();
 
 #!csharp
 
@@ -82,28 +69,20 @@ fourthNumbers.Display();
 
 string[] coordinates =
 [
-"[1, 4]",
-"[1, 8]",
-"[6, 8]",
-"[6, 4]",
-"[1, 4]",
-"[1, 8]",
-"[6, 8]",
-"[6, 4]",
-"[1, 4]",
-"[1, 8]",
-"[6, 8]",
-"[6, 4]",
-"[1, 4]",
-"[1, 8]",
-"[6, 8]",
-"[6, 4]",
-"[1, 4]",
-"[1, 8]",
-"[6, 8]",
-"[6, 4]"
+"[1, 4]", "[1, 8]", "[6, 8]", "[6, 4]", "[1, 4]", "[1, 8]", "[6, 8]",
+"[6, 4]", "[1, 4]", "[1, 8]", "[6, 8]", "[6, 4]", "[1, 4]", "[1, 8]",
+"[6, 8]", "[6, 4]", "[1, 4]", "[1, 8]", "[6, 8]", "[6, 4]"
 ];
 
 Dictionary<string, int> coordCount = coordinates.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
 
 coordCount.Display();
+
+#!csharp
+
+using System.IO;
+
+string[] lines = File.ReadAllLines(@"..\input.txt");
+int obstacles = lines.SelectMany(s => s).Count(c => c == '#');
+
+obstacles.Display();

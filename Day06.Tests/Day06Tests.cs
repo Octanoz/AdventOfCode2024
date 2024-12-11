@@ -43,9 +43,23 @@ public class Day06Tests
         Tracker sut = new(input);
 
         //Act
-        int result = sut.PartTwo(testPath);
+        int result = sut.PartTwo();
 
         //Assert
         Assert.Equal(6, result);
+    }
+
+    [Fact]
+    public void Tracker_PartTwo_Puzzle_Should_Return_1719()
+    {
+        //Arrange
+        string[] input = File.ReadAllLines(puzzlePath);
+        Tracker sut = new(input);
+
+        //Act
+        int result = sut.PartTwo();
+
+        //Assert
+        Assert.Equal(1719, result);
     }
 }

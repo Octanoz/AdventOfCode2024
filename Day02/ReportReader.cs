@@ -1,12 +1,14 @@
+using AdventUtilities;
+
 namespace Day2;
 
 public static class ReportReader
 {
-    public static int PartOne(string[] input) => input.Select(s => Array.ConvertAll(s.Split(), int.Parse))
-                                                      .Count(arr => AllSameDirection(arr));
+    public static int PartOne(string[] input) => GridExtensions.JaggedIntArray(input, ' ')
+                                                               .Count(arr => AllSameDirection(arr));
 
-    public static int PartTwo(string[] input) => input.Select(s => Array.ConvertAll(s.Split(), int.Parse))
-                                                      .Count(arr => PassWithProblemDampener(arr));
+    public static int PartTwo(string[] input) => GridExtensions.JaggedIntArray(input, ' ')
+                                                               .Count(arr => PassWithProblemDampener(arr));
 
     private static bool PassWithProblemDampener(int[] report)
     {
