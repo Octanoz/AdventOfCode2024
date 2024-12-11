@@ -1,0 +1,33 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+string testSequence = "292: 11 6 16 20";
+int colonIndex = testSequence.IndexOf(':');
+long target = long.Parse(testSequence[..colonIndex]);
+
+long[] numSequence = Array.ConvertAll(testSequence[(colonIndex + 1)..].Split(' ', StringSplitOptions.RemoveEmptyEntries), long.Parse).ToArray();
+long startValue = numSequence[0];
+
+(startValue, numSequence[1..], target).Display();
+
+#!csharp
+
+using System.IO;
+using System.Threading;
+
+string[] exampleInput = File.ReadAllLines(@"..\..\Day07\example1.txt");
+
+foreach (var testSequence in exampleInput)
+{
+    int colonIndex = testSequence.IndexOf(':');
+    long target = long.Parse(testSequence[..colonIndex]);
+
+    long[] numSequence = Array.ConvertAll(testSequence[(colonIndex + 1)..].Split(' ', StringSplitOptions.RemoveEmptyEntries), long.Parse).ToArray();
+    long startValue = numSequence[0];
+
+    (startValue, numSequence, target).Display();
+    Thread.Sleep(1000);
+}
