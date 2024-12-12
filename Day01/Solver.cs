@@ -71,17 +71,15 @@ public static class Solver
 
     public static int Alternative(string filePath)
     {
-        int[] input = Array.ConvertAll(Regex.Split(File.ReadAllText(filePath), @"(\s+|\r\n)").Where(s => !String.IsNullOrWhiteSpace(s)).ToArray(), int.Parse);
+        int[] input = Array.ConvertAll(Regex.Split(File.ReadAllText(filePath), @"(\s+|\r\n)")
+                                            .Where(s => !String.IsNullOrWhiteSpace(s))
+                                            .ToArray(), int.Parse);
 
-        Span<int> list1 = input.Where((s, i) => i % 2 == 0).ToArray();
-        Span<int> list2 = input.Where((s, i) => i % 2 != 0).ToArray();
+        var list1 = input.Where((s, i) => i % 2 == 0);
+        var list2 = input.Where((s, i) => i % 2 != 0);
 
-        int total = 0;
-        foreach (var number in list1)
-        {
-            total += number * list2.Count(number);
-        }
-
-        return total;
+        return list2.CountBy(x => x)
+                    .Where(g => list1.Contains(g.Key))
+                    .Sum(g => list1.Count(n => n == g.Key) * g.Key * g.Value);
     }
 }

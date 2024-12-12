@@ -1,0 +1,26 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+string[] input = File.ReadAllLines(@"example1.txt");
+
+int[] first = new int[input.Length];
+int[] second = new int[input.Length];
+
+for (int i = 0; i < input.Length; i++)
+{
+    (first[i], second[i]) = Array.ConvertAll(input[i].Split("   "), int.Parse) switch
+    {
+        var x => (x[0], x[1])
+    };
+
+    int total = 0;
+    foreach (var num in first)
+    {
+        total += second.Count
+    }
+}
