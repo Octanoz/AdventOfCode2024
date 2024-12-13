@@ -1,0 +1,56 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+string sequence = File.ReadAllText(@"example1.txt");
+
+int[] intSequence = sequence.Select(c => c - '0').ToArray();
+int fileId = 0;
+StringBuilder sb = new();
+for (int i = 0; i < sequence.Length; i++)
+{
+    if (i % 2 is 0)
+    {
+        sb.Append((char)(fileId + '0'), intSequence[i]);
+        fileId++;
+        continue;
+    }
+
+    sb.Append('.', intSequence[i]);
+}
+
+string decompressed = sb.ToString();
+decompressed.Display();
+
+int[] result = sb.ToString().Replace(".", "/").Select(c => c - '0').ToArray();
+
+sequence.Display();
+result.Display();
+
+#!csharp
+
+int left = 0;
+int right = result.Length - 1;
+
+while (left < right)
+{
+    if(result[left] is not -1)
+    {
+        left++;
+        continue;
+    }
+
+    if (result[right] is -1)
+    {
+        right--;
+        continue;
+    }
+
+    (result[left], result[right]) = (result[right], result[left]);
+}
+
+result.Display();
