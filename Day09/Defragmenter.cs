@@ -2,6 +2,7 @@
 namespace Day09;
 
 using System.Text;
+using System.Text.RegularExpressions;
 
 public class Defragmenter(string input)
 {
@@ -17,8 +18,34 @@ public class Defragmenter(string input)
 
     public long PartTwo()
     {
-        int[] fileBlocks = ParseCompression();
+        int[][] fileBlocks = ParseBlocks();
+        int[] compactFile = CompactBlocks(fileBlocks);
 
+        return CalculateChecksum(compactFile);
+    }
+
+    private int[] CompactBlocks(int[][] fileBlocks)
+    {
+        int[] freeBlocks = fileBlocks.Index().SelectMany(row => row.Item.Where(n => n is -1)).ToArray();
+
+        return freeBlocks;
+    }
+
+    private int[][] ParseBlocks()
+    {
+        List<int[]> fileBlocks = [];
+        foreach (Match match in Regex.Matches(compressedStructure, @"(?<file>(\d)\1{0,})|(?<free>(\.+))"))
+        {
+            if (match.Groups["file"].Success)
+            {
+                fileBlocks.Add(Enumerable.Repeat(match.Value[0] - '0', match.Value.Length).ToArray());
+                continue;
+            }
+
+            fileBlocks.Add(Enumerable.Repeat(-1, match.Length).ToArray());
+        }
+
+        return [.. fileBlocks];
     }
 
     private int[] ParseCompression()
@@ -67,8 +94,10 @@ public class Defragmenter(string input)
     }
 
     private long CalculateChecksum(int[] compactFile) => compactFile.Index().Sum(elem => (long)elem.Index * elem.Item);
+}
 
-
-
-
+static partial class Helpers
+{
+    [GeneratedRegex(@"(?<file>(\d)\1{0,})|(?<free>(\.+))")]
+    public static partial Regex Blocks();
 }

@@ -34,4 +34,18 @@ public class Day09Tests
         //Assert
         Assert.Equal(6258319840548, result);
     }
+
+    [Fact]
+    public void Defragmenter_PartTwo_TestData_Should_Return_2858()
+    {
+        //Arrange
+        string input = File.ReadAllText(testPath);
+        Defragmenter sut = new(input);
+
+        //Act
+        long result = sut.PartOne();
+
+        //Assert
+        Assert.Equal(2858, result);
+    }
 }

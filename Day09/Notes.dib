@@ -54,3 +54,14 @@ while (left < right)
 }
 
 result.Display();
+
+#!csharp
+
+using System.Text.RegularExpressions;
+
+List<int> blocks = [];
+
+foreach (Match match in Regex.Matches(sequence, @"(?<file>(\d)\1{0,})|(?<free>(\.+))"))
+{
+    
+}
