@@ -5,167 +5,162 @@ using System.Text.RegularExpressions;
 
 public class SpanDefragmentation(string input)
 {
-    private readonly string compressedStructure = input;
-
-    public long PartTwo() => CompactAndChecksum(MoveWholeFiles);
-    public long PartOne()
+    public long PartTwo()
     {
-        int[] fileBlocks = ParseCompressionOriginal();
-        int[] compactFile = CompacterOriginal(fileBlocks);
+        string fileBuffer = ParseCompression();
+        string compactFile = CompactBlocks(fileBuffer);
 
         return CalculateChecksum(compactFile);
     }
 
-    private int[] ParseCompressionOriginal()
+    private string ParseCompression()
     {
-        int[] intSequence = input.Select(c => c - '0').ToArray();
         int fileId = 0;
         StringBuilder sb = new();
         for (int i = 0; i < input.Length; i++)
         {
             if (i % 2 is 0)
             {
-                sb.Append((char)(fileId + '0'), intSequence[i]);
+                sb.Append((char)(fileId + '0'), input[i] - '0');
                 fileId++;
-                continue;
             }
-
-            sb.Append('.', intSequence[i]);
-        }
-        return sb.ToString().Replace(".", "/").Select(c => c - '0').ToArray();
-    }
-
-    private int[] CompacterOriginal(int[] fileBlocks)
-    {
-        int left = 0;
-        int right = fileBlocks.Length - 1;
-
-        while (left < right)
-        {
-            if (fileBlocks[left] is not -1)
-            {
-                left++;
-                continue;
-            }
-
-            if (fileBlocks[right] is -1)
-            {
-                right--;
-                continue;
-            }
-
-            (fileBlocks[left], fileBlocks[right]) = (fileBlocks[right], fileBlocks[left]);
+            else sb.Append('.', input[i] - '0');
         }
 
-        int negIndex = Array.IndexOf(fileBlocks, -1);
-        return fileBlocks[..negIndex];
+        return sb.ToString().Replace(".", "/");
     }
 
-    private long CompactAndChecksum(Func<Span<int>, int[]> compactingStrategy)
+    private string CompactBlocks(string fileBuffer)
     {
-        int[] fileBlocks = ParseCompression();
-        int[] compacted = compactingStrategy(fileBlocks.AsSpan());
-        return CalculateChecksum(compacted);
-    }
+        OrderedDictionary<int, Range> fileLengths = [];
+        List<Range> freeSpace = [];
 
-    private int[] ParseCompression()
-    {
-        ReadOnlySpan<char> span = compressedStructure.AsSpan();
-        List<int> blocks = [];
-
-        int fileId = 0;
-        foreach (var range in Helpers.FileOrFreeSpace().EnumerateSplits(compressedStructure))
+        foreach (var range in Helpers.Blocks().EnumerateSplits(fileBuffer))
         {
-            ReadOnlySpan<char> chunk = span[range];
-            int length = int.Parse(chunk);
-
-            // Alternate between file and free space
-            if (fileId % 2 == 0)
+            var block = fileBuffer.AsSpan(range);
+            if (Char.IsDigit(block[0]))
             {
-                blocks.AddRange(Enumerable.Repeat(fileId / 2, length)); // File ID
+                int commaIndex = block.IndexOf(',');
+                int fileId = int.Parse(block[..commaIndex]);
+                fileLengths.Add(fileId, range);
+            }
+            else freeSpace.Add(range);
+        }
+
+        return DictToString(fileLengths, freeSpace);
+    }
+
+    private string CompactBlocksAlt(string fileBuffer)
+    {
+        SortedDictionary<int, Range> fileLengths = new();
+        List<Range> freeSpace = [];
+
+        // Parse the file buffer to extract block and free space ranges
+        foreach (var range in Helpers.Blocks().EnumerateSplits(fileBuffer))
+        {
+            var block = fileBuffer.AsSpan(range);
+            if (char.IsDigit(block[0]))
+            {
+                int commaIndex = block.IndexOf(',');
+                int fileId = int.Parse(block[..commaIndex]);
+                fileLengths[fileId] = range;
             }
             else
             {
-                blocks.AddRange(Enumerable.Repeat(-1, length)); // Free space
+                freeSpace.Add(range);
             }
-
-            fileId++;
         }
 
-        return blocks.ToArray();
+        // Process blocks from highest to lowest fileId
+        foreach (var fileId in fileLengths.Keys.OrderByDescending(k => k).ToList())
+        {
+            Range currentRange = fileLengths[fileId];
+            int blockLength = currentRange.End.Value - currentRange.Start.Value;
+
+            int freeIndex = freeSpace.FindIndex(r => r.End.Value - r.Start.Value >= blockLength);
+            if (freeIndex == -1) continue; // No free space large enough
+
+            // Move the block to the free space
+            Range targetRange = freeSpace[freeIndex];
+            int newStart = targetRange.Start.Value;
+            int newEnd = newStart + blockLength;
+
+            fileLengths[fileId] = new Range(newStart, newEnd);
+
+            // Update the free space list
+            freeSpace.RemoveAt(freeIndex);
+            if (newEnd < targetRange.End.Value)
+            {
+                freeSpace.Add(new Range(newEnd, targetRange.End.Value));
+            }
+        }
+
+        // Generate the compacted buffer
+        char[] compactedBuffer = fileBuffer.ToCharArray();
+        foreach (var (fileId, range) in fileLengths)
+        {
+            for (int i = 0; i < range.End.Value - range.Start.Value; i++)
+            {
+                compactedBuffer[range.Start.Value + i] = (char)('0' + fileId);
+            }
+        }
+
+        return new string(compactedBuffer);
     }
 
-    private int[] MoveWholeFiles(Span<int> diskSpan)
+    private string DictToString(OrderedDictionary<int, Range> fileLengths, List<Range> freeSpace)
     {
-        var files = IdentifyBlocks(diskSpan, isFreeSpace: false);
-        var freeSpaces = IdentifyBlocks(diskSpan, isFreeSpace: true);
+        HashSet<int> movedBlocks = [];
+        int fileId = int.MaxValue;
 
-        files.Sort((a, b) => b.Id.CompareTo(a.Id)); // Process files in descending ID order
-
-        foreach (var file in files)
+        while (fileId > 0 && movedBlocks.Count > fileLengths.Count)
         {
-            for (int i = 0; i < freeSpaces.Count; i++)
-            {
-                var (Id, Start, Length) = freeSpaces[i];
-                if (Length >= file.Length && Start < file.Start)
-                {
-                    // Move file to the leftmost suitable free space
-                    diskSpan.Slice(Start, file.Length).Fill(file.Id);
-                    diskSpan.Slice(file.Start, file.Length).Fill(-1);
+            int blocks = fileLengths.Count;
+            var (currentBlock, currentRange) = fileLengths.GetAt(blocks - 1);
 
-                    // Update free spaces
-                    UpdateFreeSpaces(freeSpaces, Start, file.Length);
-                    break;
+            if (!movedBlocks.Add(currentBlock))
+            {
+                continue;
+            }
+
+            int currentLength = currentRange.End.Value - currentRange.Start.Value;
+
+            int availableIndex = freeSpace.FindIndex(r => r.End.Value - r.Start.Value >= currentLength);
+            Range newRange = freeSpace[availableIndex];
+            int target = newRange.End.Value + 1;
+
+            for (int i = 0; i < fileLengths.Count; i++)
+            {
+                var (_, storedRange) = fileLengths.GetAt(i);
+
+                if (storedRange.Start.Value == target)
+                {
+                    fileLengths.Insert(i, currentBlock, currentRange);
                 }
             }
-        }
 
-        return diskSpan.ToArray();
+        }
     }
 
-    private List<(int Id, int Start, int Length)> IdentifyBlocks(Span<int> span, bool isFreeSpace)
+    private static int FindLeftMostSpan(ReadOnlySpan<char> buffer, Range range)
     {
-        List<(int Id, int Start, int Length)> blocks = [];
-        int start = 0;
-
-        while (start < span.Length)
+        int emptyLength = 0;
+        for (int i = 0; i < range.Start.Value; i++)
         {
-            int current = span[start];
-            if (current == -1 == isFreeSpace)
+            if (buffer[i] is '.')
             {
-                int length = 1;
-                while (start + length < span.Length && span[start + length] == current)
+                emptyLength++;
+
+                if (emptyLength == range.End.Value)
                 {
-                    length++;
+                    return i - range.End.Value + 1;
                 }
-
-                blocks.Add((current, start, length));
-                start += length;
-            }
-            else
-            {
-                start++;
+                else emptyLength = 0;
             }
         }
 
-        return blocks;
+        return -1;
     }
-
-    private void UpdateFreeSpaces(List<(int Id, int Start, int Length)> freeSpaces, int start, int length)
-    {
-        int index = freeSpaces.FindIndex(fs => fs.Start == start);
-        if (index >= 0)
-        {
-            var (freeId, freeStart, freeLength) = freeSpaces[index];
-            freeSpaces.RemoveAt(index);
-
-            if (freeLength > length)
-            {
-                freeSpaces.Insert(index, (freeId, freeStart + length, freeLength - length));
-            }
-        }
-    }
-
     private long CalculateChecksum(Span<int> diskSpan)
     {
         long checksum = 0;
@@ -178,10 +173,40 @@ public class SpanDefragmentation(string input)
         }
         return checksum;
     }
+
+    private long CalculateChecksumBlocks(List<int[]> fileBlocks)
+    {
+        long total = 0;
+        foreach (var (index, elem) in fileBlocks.SelectMany(n => n).Index())
+        {
+            if (elem > 0)
+            {
+                checked
+                {
+                    total += elem * index;
+                }
+            }
+        }
+
+        return total;
+    }
+
+    private static void CleanEmptyBlocks(List<int[]> blocks)
+    {
+        for (int i = 1; i < blocks.Count; i++)
+        {
+            if (IsEmpty(blocks[i - 1]) && IsEmpty(blocks[i]))
+            {
+                int[] move = blocks[i - 1];
+                blocks.RemoveAt(i - 1);
+
+                blocks[i - 1] = [.. blocks[i - 1], .. move];
+            }
+        }
+    }
+
+    private bool IsEmpty(int[] blocks) => Array.TrueForAll(blocks, n => n == -1);
+    private bool IsEmpty(char[] blocks) => Array.TrueForAll(blocks, c => c is '/' or '.');
+    private bool IsEmpty(Span<char> blockSpan) => !blockSpan.ContainsAnyExcept('.');
 }
 
-static partial class Helpers
-{
-    [GeneratedRegex(@"\d")]
-    public static partial Regex FileOrFreeSpace();
-}

@@ -27,58 +27,65 @@ public class Defragmenter(string input)
     private List<int[]> CompactBlocks(List<int[]> fileBlocks)
     {
         int left = 0;
-        int right = fileBlocks.Count - 1;
-        while (right > 0)
+        int currentId = 0;
+        for (int i = fileBlocks.Count - 1; i >= 0; i--)
         {
-            int emptyLength = -1;
-            if (IsEmpty(fileBlocks[right]))
+            for (int j = 0; j < GetBlocksFileId(fileBlocks, i).Length; j++)
             {
-                right--;
-                continue;
-            }
-
-            int fileLength = fileBlocks[right].Length;
-            while (left < right && emptyLength < fileLength)
-            {
-                if (!IsEmpty(fileBlocks[left]))
+                int emptyLength = -1;
+                int right = GetBlocksFileId(fileBlocks, i)[j];
+                if (j is 0)
                 {
-                    left++;
+                    currentId = fileBlocks[right][0];
+                }
+
+                if (j > 0 && fileBlocks[right][0] != currentId)
+                {
+                    throw new ArgumentException($"Expected to iterate over all {currentId} arrays but current array has {fileBlocks[right][0]} as ID.");
+                }
+
+                int fileLength = fileBlocks[right].Length;
+                while (left < right && emptyLength < fileLength)
+                {
+                    if (!IsEmpty(fileBlocks[left]))
+                    {
+                        left++;
+                        continue;
+                    }
+
+                    emptyLength = fileBlocks[left].Length;
+                    if (emptyLength < fileLength)
+                    {
+                        left++;
+                    }
+                }
+
+                if (left >= right)
+                {
+                    left = 0;
                     continue;
                 }
 
-                emptyLength = fileBlocks[left].Length;
-                if (emptyLength < fileLength)
+                if (emptyLength > fileLength)
                 {
-                    left++;
+                    int[] move = fileBlocks[left][fileLength..];
+                    fileBlocks[left] = fileBlocks[left][..fileLength];
+
+                    (fileBlocks[left], fileBlocks[right]) = (fileBlocks[right], fileBlocks[left]);
+                    if (IsEmpty(fileBlocks[left + 1]))
+                    {
+                        fileBlocks[left + 1] = [.. fileBlocks[left + 1], .. move];
+                    }
+                    else fileBlocks.Insert(left + 1, move);
                 }
-            }
 
-            if (left >= right)
-            {
-                right--;
-                left = 0;
-                continue;
-            }
-
-            if (emptyLength > fileLength)
-            {
-                int[] move = fileBlocks[left][fileLength..];
-                fileBlocks[left] = fileBlocks[left][..fileLength];
-
-                (fileBlocks[left], fileBlocks[right]) = (fileBlocks[right], fileBlocks[left]);
-                if (IsEmpty(fileBlocks[left + 1]))
+                if (emptyLength == fileLength)
                 {
-                    fileBlocks[left + 1] = [.. fileBlocks[left + 1], .. move];
+                    (fileBlocks[left], fileBlocks[right]) = (fileBlocks[right], fileBlocks[left]);
                 }
-                else fileBlocks.Insert(left + 1, move);
-            }
 
-            if (emptyLength == fileLength)
-            {
-                (fileBlocks[left], fileBlocks[right]) = (fileBlocks[right], fileBlocks[left]);
+                CleanEmptyBlocks(fileBlocks);
             }
-
-            CleanBlocks(fileBlocks);
         }
 
         return fileBlocks;
@@ -155,25 +162,46 @@ public class Defragmenter(string input)
 
     private long CalculateChecksumBlocks(List<int[]> fileBlocks)
     {
-        int total = 0;
+        long total = 0;
         foreach (var (index, elem) in fileBlocks.SelectMany(n => n).Index())
         {
             if (elem > 0)
             {
-                total += elem * index;
+                checked
+                {
+                    total += elem * index;
+                }
             }
         }
 
         return total;
     }
 
-    private List<int[]> GetBlocksFileId(List<int[]> blocks, int fileId) => blocks.FindAll(arr => Array.TrueForAll(arr, n => n == fileId));
+    private Span<int> GetBlocksFileId(List<int[]> blocks, int fileId) => blocks.Select((arr, index) => (arr, index))
+                                                                               .Where(tup => Array.TrueForAll(tup.arr, n => n == fileId))
+                                                                               .Select(tup => tup.index)
+                                                                               .OrderDescending()
+                                                                               .ToArray();
 
-    private static void CleanBlocks(List<int[]> blocks)
+    private static void CleanEmptyBlocks(List<int[]> blocks)
     {
         for (int i = 1; i < blocks.Count; i++)
         {
             if (IsEmpty(blocks[i - 1]) && IsEmpty(blocks[i]))
+            {
+                int[] move = blocks[i - 1];
+                blocks.RemoveAt(i - 1);
+
+                blocks[i - 1] = [.. blocks[i - 1], .. move];
+            }
+        }
+    }
+
+    private static void CleanAllBlocks(List<int[]> blocks)
+    {
+        for (int i = 1; i < blocks.Count; i++)
+        {
+            if (blocks[i - 1][0] == blocks[i][0])
             {
                 int[] move = blocks[i - 1];
                 blocks.RemoveAt(i - 1);
