@@ -33,35 +33,102 @@ result.Display();
 
 #!csharp
 
-int left = 0;
-int right = result.Length - 1;
+using System.Text.RegularExpressions;
 
-while (left < right)
+int fileId = 0;
+List<int[]> fileBlocks = [];
+foreach (Match match in Regex.Matches(decompressed, @"(?<file>(\d)\1{0,})|(?<free>(\.+))"))
 {
-    if(result[left] is not -1)
+    if (match.Groups["file"].Success)
     {
-        left++;
+        fileBlocks.Add(Enumerable.Repeat(fileId, match.Value.Length).ToArray());
+        fileId++;
         continue;
     }
 
-    if (result[right] is -1)
-    {
-        right--;
-        continue;
-    }
-
-    (result[left], result[right]) = (result[right], result[left]);
+    fileBlocks.Add(Enumerable.Repeat(-1, match.Length).ToArray());
 }
 
-result.Display();
+fileBlocks.Display();
 
 #!csharp
 
-using System.Text.RegularExpressions;
+// fileBlocks.ForEach(arr => Console.WriteLine($"[ {String.Join(", ", arr)} ]"));
 
-List<int> blocks = [];
+fileBlocks[1][..2].Display();
+fileBlocks[1][2..].Display();
 
-foreach (Match match in Regex.Matches(sequence, @"(?<file>(\d)\1{0,})|(?<free>(\.+))"))
+var move = fileBlocks[1][2..];
+fileBlocks[1] = fileBlocks[1][..2];
+fileBlocks.Insert(2, move);
+
+(fileBlocks[1], fileBlocks[^1]) = (fileBlocks[^1], fileBlocks[1]);
+
+fileBlocks.Display();
+
+#!csharp
+
+static bool IsEmpty(int[] arr) => Array.TrueForAll(arr, n => n is -1);
+
+int left = 0;
+int right = fileBlocks.Count - 1;
+while (right > 0)
 {
+    var (emptyLength, fileLength) = (0,0);
+    if (IsEmpty(fileBlocks[right]))
+    {
+        right--;
+        continue;        
+    }
     
+    fileLength = fileBlocks[right].Length;
+
+    while (!IsEmpty(fileBlocks[left]))
+    {
+        if (++left >=fileBlocks.Count)
+        {
+            right--;
+            left = 0;
+            continue;        
+        }
+
+        emptyLength = fileBlocks[left].Length;
+
+        if (emptyLength < fileLength)
+            continue;
+    }
+
+    if (emptyLength > fileLength)
+    {
+        var move = fileBlocks[left][fileLength..];
+        fileBlocks[left] = fileBlocks[left][..fileLength];
+
+        (fileBlocks[left], fileBlocks[right]) = (fileBlocks[right], fileBlocks[left]);
+        fileBlocks.Insert(left + 1, move);
+    }
+    else if (emptyLength == fileLength)
+    {
+        /* int currentFileId = fileBlocks[right][0];
+        Array.Fill(fileBlocks[left], currentFileId);
+        Array.Fill(fileBlocks[right], -1); */
+
+        (fileBlocks[left], fileBlocks[right]) = (fileBlocks[right], fileBlocks[left]);
+    }
+
+    right--;
+    left = 0;
 }
+
+fileBlocks.Display();
+
+#!markdown
+
+### Examples
+
+    00...111...2...333.44.5555.6666.777.888899
+    0099.111...2...333.44.5555.6666.777.8888..
+    0099.1117772...333.44.5555.6666.....8888..
+    0099.111777244.333....5555.6666.....8888..
+    00992111777.44.333....5555.6666.....8888..
+
+The process of updating the filesystem checksum is the same; now, this example's checksum would be 2858.

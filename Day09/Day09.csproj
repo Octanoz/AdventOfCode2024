@@ -11,4 +11,8 @@
     <ProjectReference Include="..\AdventUtilities\AdventUtilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.4.0" />
+  </ItemGroup>
+
 </Project>

@@ -43,7 +43,7 @@ public class Day09Tests
         Defragmenter sut = new(input);
 
         //Act
-        long result = sut.PartOne();
+        long result = sut.PartTwo();
 
         //Assert
         Assert.Equal(2858, result);
