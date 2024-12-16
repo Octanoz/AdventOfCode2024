@@ -48,4 +48,18 @@ public class Day09Tests
         //Assert
         Assert.Equal(2858, result);
     }
+
+    [Fact]
+    public void Defragmenter_PartTwo_Puzzle_Should_Return_6286182965311()
+    {
+        //Arrange
+        string input = File.ReadAllText(puzzlePath);
+        SpanDefragmentation sut = new(input);
+
+        //Act
+        long result = sut.PartTwo();
+
+        //Assert
+        Assert.Equal(6286182965311, result);
+    }
 }

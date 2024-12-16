@@ -15,8 +15,7 @@ Defragmenter df = new(input);
 #if PART1
 long result = df.PartOne();
 #else
-//? 1307230463 was too low
-//? 7779132292704 was too high
-long result = df.PartTwo();
+SpanDefragmentation sd = new(input);
+long result = sd.PartTwo();
 #endif
 Console.WriteLine(result);
