@@ -40,7 +40,7 @@ public class Day09Tests
     {
         //Arrange
         string input = File.ReadAllText(testPath);
-        Defragmenter sut = new(input);
+        SpanDefragmentation sut = new(input);
 
         //Act
         long result = sut.PartTwo();
