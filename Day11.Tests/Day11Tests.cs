@@ -36,4 +36,20 @@ public class Day11Tests
         //Assert
         Assert.Equal(186424, result);
     }
+
+    [Theory]
+    [InlineData(6, 22)]
+    [InlineData(25, 55312)]
+    public void Blink_PartTwo_TestData_Should_Return_Expected(int blinkCount, long expected)
+    {
+        //Arrange
+        string input = File.ReadAllText(testPath);
+        Blink sut = new(input);
+
+        //Act
+        long result = sut.PartTwo(blinkCount);
+
+        //Assert
+        Assert.Equal(expected, result);
+    }
 }

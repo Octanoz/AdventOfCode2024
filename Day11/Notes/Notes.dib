@@ -58,3 +58,47 @@ int test = 9543;
 
 int divisor = (int)Math.Pow(10, test.ToString().Length / 2);
 divisor.Display();
+
+#!csharp
+
+List<int> numberList = [2, 0, 2, 4];
+var zeroes = numberList.Where(n => n <= 0);
+var rest = numberList.Except(zeroes).ToList();
+
+rest.Display();
+
+#!csharp
+
+using System.Threading;
+
+Dictionary<int, List<int>> numFriends = [];
+
+int[] friendNums = [1,2,3,4,5,6,7,8,9];
+
+List<int> storedList;
+for (int i = 1; i < 6; i++)
+{
+    if (i % 2 != 0)
+    {
+        foreach (var num in friendNums)
+        {
+            if (!numFriends.TryGetValue(num, out storedList))
+            {
+                numFriends[num] = [num];
+            }
+            else storedList.Add(num);
+        }
+
+        continue;
+    }
+
+    foreach (var num in friendNums.Select(n => n * i))
+    {
+        if (!numFriends.TryGetValue(num, out storedList))
+        {
+            numFriends[num] = [num];
+        }
+        else storedList.Add(num);
+    }
+}
+    numFriends.Display();
