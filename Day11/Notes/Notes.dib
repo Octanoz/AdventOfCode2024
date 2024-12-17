@@ -1,0 +1,60 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+List<int> numbers = [0, 1, 10, 99, 999];
+
+int index = 0;
+while (index < numbers.Count)
+{
+    switch(numbers[index])
+    {
+        case 0:
+            numbers[index] = 1;
+            break;
+        case var n when $"{n}".Length % 2 == 0:
+            int divisor = (int)Math.Pow(10, numbers[index].ToString().Length / 2);
+            int left = numbers[index] / divisor;
+            int right = numbers[index] % divisor;
+
+            numbers.RemoveAt(index);
+            numbers.InsertRange(index, [left, right]);
+            index++;
+            break;
+        default:
+            numbers[index] *= 2024;
+            break;
+    }
+
+    Console.WriteLine(numbers[index]);
+
+    index++;
+}
+
+numbers.Display();
+
+#!csharp
+
+int num = 9564;
+
+int divided = num / 100;
+int rem = num % 100;
+
+divided.Display();
+rem.Display();
+
+#!csharp
+
+for (int i = 0; i < 6; i++)
+{
+    Console.WriteLine(Math.Pow(10, i));
+}
+
+#!csharp
+
+int test = 9543;
+
+int divisor = (int)Math.Pow(10, test.ToString().Length / 2);
+divisor.Display();
