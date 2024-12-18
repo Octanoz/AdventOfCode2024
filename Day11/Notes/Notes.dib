@@ -102,3 +102,12 @@ for (int i = 1; i < 6; i++)
     }
 }
     numFriends.Display();
+
+#!csharp
+
+Dictionary<int, bool> numDict = [];
+
+bool isEven = numDict[4] = 4 % 2 == 0;
+
+isEven.Display();
+numDict.Display();
