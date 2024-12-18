@@ -5,20 +5,10 @@ namespace Day11;
 
 public class Blink(string input)
 {
-    private LinkedList<long> linkedStones = new(Array.ConvertAll(input.Split(), long.Parse));
+    private readonly LinkedList<long> linkedStones = new(Array.ConvertAll(input.Split(), long.Parse));
 
-    private long totalStones = 0;
-    private static List<long> stones = [];
-
-    private static readonly Dictionary<long, bool> problematicZeroCache = [];
-
-    private static readonly Dictionary<long, List<long>> cachedResults = new()
+    private static readonly Dictionary<long, List<long>> cachedSplits = new()
     {
-        [0L] = [1L],
-        [1L] = [2024L],
-        [2L] = [4048L],
-        [4L] = [8096L],
-        [8L] = [16192L],
         [20L] = [2L, 0L],
         [24L] = [2L, 4L],
         [40L] = [4L, 0L],
@@ -29,13 +19,6 @@ public class Blink(string input)
         [4048L] = [40L, 48L],
         [8096L] = [80L, 96L]
     };
-
-    private Dictionary<Number, List<long>> stoneNumbers = new()
-    {
-        [Number.Contains0] = [],
-        [Number.Other] = []
-    };
-
 
     public int PartOne(int blinkCount)
     {
@@ -49,50 +32,44 @@ public class Blink(string input)
 
     public long PartTwo(int blinkCount)
     {
-        Setup();
+        Dictionary<long, long> currentState = linkedStones.GroupBy(n => n)
+                                                          .ToDictionary(g => g.Key, g => (long)g.Count());
 
+        Dictionary<long, long> newState = [];
         for (int i = 0; i < blinkCount; i++)
         {
-            BlinkIfTheyAreInTheRoomWithYou(blinkCount - i);
+            foreach (var (num, count) in currentState)
+            {
+                BlinkIfTheyAreInTheRoomWithYou(num, count, newState);
+            }
+            currentState = new(newState);
+            newState.Clear();
         }
 
-        totalStones += stones.Count;
-
-        return totalStones;
+        return currentState.Values.Sum();
     }
 
-    private void Setup() => stones = new(linkedStones);
-
-    private void BlinkIfTheyAreInTheRoomWithYou(int stepsLeft)
+    private static void BlinkIfTheyAreInTheRoomWithYou(long stone, long freq, Dictionary<long, long> next)
     {
-        List<long> blinkedStones = [];
-
-        foreach (var stone in stones)
+        switch (stone)
         {
-            if (cachedResults.TryGetValue(stone, out var storedResult))
-            {
-                blinkedStones.AddRange(storedResult);
-            }
+            case 0:
+                next[1] = next.TryGetValue(1, out var cached) ? cached + freq : freq;
+                break;
 
-            if (HasEvenDigitCount(stone))
-            {
-                blinkedStones.AddRange(SplitStone(stone));
-            }
-            else
-            {
-                cachedResults[stone] = [stone * 2024L];
-                blinkedStones.AddRange(cachedResults[stone]);
-            }
+            case var n when HasEvenDigitCount(n):
+                var splits = SplitStone(n);
+
+                next[splits[0]] = next.TryGetValue(splits[0], out cached) ? cached + freq : freq;
+                next[splits[1]] = next.TryGetValue(splits[1], out cached) ? cached + freq : freq;
+                break;
+
+            default:
+                long newStone = stone * 2024L;
+                next[newStone] = next.TryGetValue(newStone, out cached) ? cached + freq : freq;
+                break;
         }
-
-        if (stepsLeft >= 18)
-        {
-            totalStones += blinkedStones.Count(s => s is 0L && s is 1L) * 54;
-        }
-
-        stones = blinkedStones.Where(stone => stone > 1).ToList();
     }
-
     private void BlinkTimes()
     {
         var currentNode = linkedStones.First;
@@ -129,7 +106,7 @@ public class Blink(string input)
 
     private static List<long> SplitStone(long num)
     {
-        if (cachedResults.TryGetValue(num, out var cachedResult))
+        if (cachedSplits.TryGetValue(num, out var cachedResult))
         {
             return cachedResult;
         }
@@ -137,27 +114,8 @@ public class Blink(string input)
         int halfLength = DigitCount(num) / 2;
         long divisor = Divisor(halfLength);
 
-        List<long> result = cachedResults[num] = [num / divisor, num % divisor];
+        List<long> result = cachedSplits[num] = [num / divisor, num % divisor];
 
         return result;
     }
-
-    private static bool ProblematicZero(long num)
-    {
-        int mid = DigitCount(num) / 2;
-        string numString = num.ToString();
-
-        if (numString.AsSpan()[mid..].Contains('0'))
-        {
-            return true;
-        }
-
-        return false;
-    }
-}
-
-public enum Number
-{
-    Contains0,
-    Other
 }

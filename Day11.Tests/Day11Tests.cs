@@ -52,4 +52,18 @@ public class Day11Tests
         //Assert
         Assert.Equal(expected, result);
     }
+
+    [Fact]
+    public void BLink_PartTwo_Puzzle_Should_Return_219838428124832()
+    {
+        //Arrange
+        string input = File.ReadAllText(puzzlePath);
+        Blink sut = new(input);
+
+        //Act
+        long result = sut.PartTwo(75);
+
+        //Assert
+        Assert.Equal(219838428124832, result);
+    }
 }
