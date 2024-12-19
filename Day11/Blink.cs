@@ -32,21 +32,21 @@ public class Blink(string input)
 
     public long PartTwo(int blinkCount)
     {
-        Dictionary<long, long> currentState = linkedStones.GroupBy(n => n)
+        Dictionary<long, long> currentCounts = linkedStones.GroupBy(n => n)
                                                           .ToDictionary(g => g.Key, g => (long)g.Count());
 
-        Dictionary<long, long> newState = [];
+        Dictionary<long, long> newCounts = [];
         for (int i = 0; i < blinkCount; i++)
         {
-            foreach (var (num, count) in currentState)
+            foreach (var (num, count) in currentCounts)
             {
-                BlinkIfTheyAreInTheRoomWithYou(num, count, newState);
+                BlinkIfTheyAreInTheRoomWithYou(num, count, newCounts);
             }
-            currentState = new(newState);
-            newState.Clear();
+            currentCounts = new(newCounts);
+            newCounts.Clear();
         }
 
-        return currentState.Values.Sum();
+        return currentCounts.Values.Sum();
     }
 
     private static void BlinkIfTheyAreInTheRoomWithYou(long stone, long freq, Dictionary<long, long> next)
