@@ -22,7 +22,6 @@ public class Perimeter(Coord firstCoord)
         while (queue.Count is not 0)
         {
             var current = queue.Dequeue();
-
             foreach (var neighbour in current.Neighbours.Where(nb => WithinBounds(nb, maxRow, maxCol)))
             {
                 if (map[neighbour.Row][neighbour.Col] == targetLetter && Region.Add(neighbour))

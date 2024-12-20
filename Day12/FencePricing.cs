@@ -43,7 +43,7 @@ public static class FencePricing
         HashSet<Coord> visited = [];
         List<Perimeter2D> perimeters = [];
 
-        int totalSides = 0;
+        int totalPrice = 0;
         for (int row = 0; row < map.Height; row++)
         {
             for (int col = 0; col < map.Width; col++)
@@ -55,32 +55,40 @@ public static class FencePricing
                 Perimeter2D currentPerimeter = new(current);
                 perimeters.Add(currentPerimeter);
                 currentPerimeter.ExpandRegion(map);
-                visited.UnionWith(currentPerimeter.Region);
 
-                foreach (var innerRegion in GetInnerRegions(currentPerimeter))
-                {
-                    perimeters.Add(innerRegion);
-                    visited.UnionWith(innerRegion.Region);
-                    totalSides += innerRegion.Sides;
-                }
-
-                totalSides += currentPerimeter.Sides;
+                totalPrice += AddToTotal(currentPerimeter, visited);
             }
         }
 
-        return totalSides * 4;
+        return totalPrice;
     }
 
-    private static IEnumerable<Perimeter2D> GetInnerRegions(Perimeter2D outer)
+    private static int AddToTotal(Perimeter2D perimeter, HashSet<Coord> visited)
     {
-        foreach (var innerRegion in outer.InnerRegions)
+        int price = perimeter.Sides * perimeter.Region.Count;
+        Console.WriteLine($"{perimeter.Id}: {perimeter.Region.Count} x {perimeter.Sides}\n");
+        visited.UnionWith(perimeter.Region);
+
+        foreach (var innerRegion in GetInnerRegions(perimeter, visited))
         {
-            foreach (var inner in GetInnerRegions(innerRegion))
+            price += innerRegion.Sides * innerRegion.Region.Count;
+            Console.WriteLine($"{innerRegion.Id}: {innerRegion.Region.Count} x {innerRegion.Sides}\n");
+        }
+
+        return price;
+    }
+
+    private static IEnumerable<Perimeter2D> GetInnerRegions(Perimeter2D outer, HashSet<Coord> visited)
+    {
+        foreach (var inner in outer.InnerRegions)
+        {
+            foreach (var deeper in GetInnerRegions(inner, visited))
             {
-                yield return inner;
+                yield return deeper;
             }
 
-            yield return innerRegion;
+            visited.UnionWith(inner.Region);
+            yield return inner;
         }
     }
 }
