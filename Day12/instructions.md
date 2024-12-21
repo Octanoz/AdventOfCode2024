@@ -203,7 +203,7 @@ The larger example from before now has the following updated prices:
 | I | $14 * 16$ | $224$ |
 | M | $5 * 6$ | $30$ |
 | S | $3 * 6$ | $18$ |
-| **Total** | **Sum All** | $1200$ |
+| **Total** | **Sum All** | $1206$ |
 
 Adding these together produces its new total price of `1206`.
 

@@ -7,9 +7,7 @@ public class Perimeter2D(Coord firstCoord)
 {
     public char Id { get; private set; }
     public HashSet<Coord> Region { get; private set; } = [firstCoord];
-    public List<Coord> OuterPerimeter { get; set; } = [];
-    public HashSet<Coord> Unconnected { get; set; } = [];
-    public List<Perimeter2D> InnerRegions { get; private set; } = [];
+    public List<Coord> Outline { get; set; } = [];
     public bool HasExpanded { get; private set; } = false;
     public int Sides { get; private set; } = 0;
 
@@ -19,6 +17,7 @@ public class Perimeter2D(Coord firstCoord)
         char targetLetter = map[firstCoord.Row, firstCoord.Col];
         Id = targetLetter;
 
+        HashSet<(Coord, Coord)> edges = [];
         Queue<Coord> queue = [];
         queue.Enqueue(firstCoord);
         while (queue.Count is not 0)
@@ -28,7 +27,7 @@ public class Perimeter2D(Coord firstCoord)
             {
                 if (!WithinBounds(neighbour, maxRow, maxCol) || map[neighbour.Row, neighbour.Col] != targetLetter)
                 {
-                    Unconnected.Add(current);
+                    edges.Add((current, neighbour));
                 }
                 else if (Region.Add(neighbour))
                 {
@@ -38,289 +37,154 @@ public class Perimeter2D(Coord firstCoord)
         }
 
         HasExpanded = true;
-        SetOuterPerimeter();
-        FindInnerRegions(map);
+        ProcessEdges(edges, map);
     }
 
-    private void SetOuterPerimeter()
+    private void ProcessEdges(HashSet<(Coord start, Coord end)> edges, Span2D<char> map)
     {
         if (!HasExpanded)
             return;
 
-        if (Region.Count is 1)
-        {
-            OuterPerimeter = new(Region);
-            Unconnected.Clear();
-            Sides = 4;
-            return;
-        }
-
-        ProcessPillars(); //Single cell lines
-
-        ProcessCorners(); // 2 neighbours in the Region list, the others out of bounds or wrong letter on the map
-
-        Unconnected = Unconnected.Except(OuterPerimeter).ToHashSet();
+        Outline = edges.SelectMany(edge => (Coord[])[edge.start, edge.end]).Distinct().ToList();
+        Sides = CalculateSides(map, edges);
     }
 
-    private void ProcessPillars()
+    public int CalculateSides(Span2D<char> map, HashSet<(Coord start, Coord end)> edges)
     {
         HashSet<Coord> visited = [];
-        var pillars = Unconnected.Where(IsPillar);
-        foreach (var pillar in pillars)
+        if (!IsPillar(firstCoord) && Region.Any(IsPillar))
         {
-            if (!visited.Add(pillar))
-                continue;
+            firstCoord = Region.Where(IsPillar).OrderBy(c => c.Row).First();
+        }
 
-            Sides += 3;
+        var (dir, sides, travelClockwise) = InitializeTravel(firstCoord);
 
-            OuterPerimeter.Add(pillar);
+        Coord current = firstCoord;
+        while (true)
+        {
+            visited.Add(current);
 
-            if (!pillar.Neighbours.Any(Unconnected.Contains))
-                continue;
+            if (current == firstCoord && sides >= 4)
+                break;
 
-            var (current, dir) = PillarProcessDirection(pillar);
-
-            while (current.Neighbours.Count(Region.Contains) is 2)
+            if (PreferredCoordAvailable(current, dir, travelClockwise))
             {
-                if (!visited.Add(current))
-                    break;
-
-                OuterPerimeter.Add(current);
-
-                Coord next = current.Neighbours.Skip((int)dir).First();
-
-                current = next;
+                sides++;
+                dir = travelClockwise
+                    ? (Direction)(((int)dir + 3) & 3)
+                    : (Direction)(((int)dir + 1) & 3);
             }
 
-            if (IsPillar(current))
+            Coord next = NextCoord(current, dir);
+            if (!Region.Contains(next))
             {
-                Sides++;
-                OuterPerimeter.Add(current);
-                visited.Add(current);
-            }
-        }
-    }
-
-    private (Coord, Direction) PillarProcessDirection(Coord current)
-    {
-        var (index, coord) = current.Neighbours.Index().First(elem => Region.Contains(elem.Item));
-
-        return (coord, (Direction)index);
-    }
-
-    private void ProcessCorners()
-    {
-        Dictionary<Coord, int> corners = [];
-        foreach (var corner in Unconnected.Where(IsCorner))
-        {
-            corners[corner] = corner.Neighbours.Any(IsCorner) ? 1 : 2;
-            OuterPerimeter.Add(corner);
-        }
-
-        foreach (var corner in corners.Keys)
-        {
-            if (corner.Neighbours.Any(IsCorner))
-            {
-                corners[corner] = 1;
-            }
-
-            Sides += corners[corner];
-
-            foreach (var neighbour in corner.Neighbours.Where(nb => Region.Contains(nb) && !OuterPerimeter.Contains(nb)))
-            {
-                Direction dir = neighbour switch
-                {
-                    var c when c == corner.Up => new(),
-                    var c when c == corner.Right => (Direction)1,
-                    var c when c == corner.Down => (Direction)2,
-                    _ => (Direction)3
-                };
-
-                OuterPerimeter.Add(neighbour);
-                AddIfWithinRegion(neighbour, dir, corners);
-            }
-        }
-
-        OuterPerimeter = OuterPerimeter.Distinct().ToList();
-    }
-
-    private void AddIfWithinRegion(Coord current, Direction direction, Dictionary<Coord, int> corners)
-    {
-        if (current.Neighbours.All(Region.Contains))
-        {
-            OuterPerimeter.Remove(current);
-            return;
-        }
-
-        Coord[] neighbours = current.Neighbours.ToArray();
-        if (Region.Contains(neighbours[(int)direction]))
-        {
-            Coord neighbour = neighbours[(int)direction];
-            OuterPerimeter.Add(neighbour);
-            AddIfWithinRegion(neighbour, direction, corners);
-        }
-        else if (corners.TryGetValue(current, out int storedValue))
-        {
-            corners[current] = int.Max(0, storedValue - 1);
-        }
-    }
-
-    private void FindInnerRegions(Span2D<char> map)
-    {
-        if (Region.Count < 8 || Unconnected.Count < 4)
-            return;
-
-        List<Coord> missingNeighbours = Unconnected.SelectMany(c => c.Neighbours.Where(n => !Region.Contains(n))).Distinct().ToList();
-        HashSet<Coord> visited = [];
-
-        foreach (var coord in missingNeighbours.Where(c => !visited.Contains(c)))
-        {
-            if (coord.Neighbours.All(nb => Unconnected.Contains(nb) || OuterPerimeter.Contains(nb)))
-            {
-                Perimeter2D innerPerimeter = new(coord);
-                innerPerimeter.ExpandRegion(map);
-                InnerRegions.Add(innerPerimeter);
-                visited.Add(coord);
-
-                foreach (var neighbour in coord.Neighbours.Where(neighbour => neighbour.Neighbours.All(nb => Region.Contains(nb) || innerPerimeter.OuterPerimeter.Contains(nb))))
-                {
-                    Unconnected.Remove(neighbour);
-                }
-
-                Sides += 4;
+                sides++;
+                dir = travelClockwise
+                    ? (Direction)(((int)dir + 1) & 3)
+                    : (Direction)(((int)dir + 3) & 3);
 
                 continue;
             }
 
-            if (FormsLoop(coord, missingNeighbours, visited))
-            {
-                Perimeter2D innerPerimeter = new(coord);
-                innerPerimeter.ExpandRegion(map);
-                InnerRegions.Add(innerPerimeter);
-                Sides += innerPerimeter.Sides;
-
-                var touchingCoords = innerPerimeter.OuterPerimeter
-                                     .SelectMany(c => c.Neighbours
-                                         .Where(nb => !innerPerimeter.Region.Contains(nb)));
-
-                foreach (var element in touchingCoords)
-                {
-                    Unconnected.Remove(element);
-                }
-            }
+            current = next;
         }
 
-        CleanUnconnected();
+        edges.RemoveWhere(edge => edge.end.Row < Region.Min(c => c.Row)
+                               || edge.end.Row > Region.Max(c => c.Row)
+                               || edge.end.Col < Region.Min(c => c.Col)
+                               || edge.end.Col > Region.Max(c => c.Col));
 
-        if (Unconnected.Count is not 0)
+        foreach (var edge in edges.Where(edge => !visited.Contains(edge.start)).OrderByDescending(e => edges.Count(x => x.end == e.end)))
         {
-            Sides += CountSides();
-        }
-    }
-
-    private int CountSides()
-    {
-        int sides = 0;
-        HashSet<Coord> visited = [];
-        Stack<Coord> stack = [];
-        foreach (var coord in Unconnected.Where(c => !visited.Contains(c)))
-        {
-            sides++;
-
-            stack.Push(coord);
-            while (stack.Count is not 0)
-            {
-                var current = stack.Pop();
-                if (!visited.Add(current))
-                    continue;
-
-                foreach (var neighbour in current.Neighbours.Where(nb => Unconnected.Contains(nb)))
-                {
-                    stack.Push(neighbour);
-                }
-            }
-        }
-
-        if (sides is 1)
-        {
-            throw new InvalidDataException($"Edges of the region not belonging to an inner region, if any, should be greater than 1");
+            sides += FindInnerSides(map, edge.end, visited);
         }
 
         return sides;
     }
 
-    private static bool FormsLoop(Coord start, List<Coord> missing, HashSet<Coord> visited)
+    private int FindInnerSides(Span2D<char> map, Coord current, HashSet<Coord> visited)
     {
-        Stack<Coord> stack = [];
-        foreach (var neighbour in start.Neighbours.Where(nb => missing.Contains(nb)))
+        if (!visited.Add(current))
+            return 0;
+
+        if (current.Neighbours.All(Region.Contains))
         {
-            stack.Push(neighbour);
+            return 4;
         }
 
-        visited.Add(start);
-
-        while (stack.Count is not 0)
+        while (!Region.Contains(current.Up) && !Region.Contains(current.Left))
         {
-            var current = stack.Pop();
-            if (current == start)
-                return true;
-
-            if (!visited.Add(current))
-                continue;
-
-            foreach (var neighbour in current.Neighbours.Where(nb => missing.Contains(nb)))
+            if (!Region.Contains(current.Up))
             {
-                stack.Push(neighbour);
+                current = current.Up;
+            }
+
+            if (!Region.Contains(current.Left))
+            {
+                current = current.Left;
             }
         }
 
-        return false;
+        Perimeter2D innerPerimeter = new(current);
+        innerPerimeter.ExpandRegion(map);
+        visited.UnionWith(innerPerimeter.Region);
+
+        if (!innerPerimeter.Outline.All(coord => coord.Neighbours.Any(nb => Region.Contains(nb))))
+        {
+            return 0;
+        }
+
+        return innerPerimeter.Sides;
     }
-
-    private void CleanUnconnected()
+    private bool PreferredCoordAvailable(Coord coord, Direction travelling, bool travelClockwise = false) => travelClockwise switch
     {
-        var missesNeighbour = Unconnected.ToList();
-        foreach (var strayCell in missesNeighbour)
+        false => travelling switch
         {
-            if (strayCell.Neighbours.All(nb => Region.Contains(nb) || InnerRegions.Any(r => r.OuterPerimeter.Contains(nb))))
-            {
-                Unconnected.Remove(strayCell);
-            }
+            Direction.Up when Region.Contains(coord.Right) => true,
+            Direction.Right when Region.Contains(coord.Down) => true,
+            Direction.Down when Region.Contains(coord.Left) => true,
+            Direction.Left when Region.Contains(coord.Up) => true,
+            _ => false
+        },
+
+        true => travelling switch
+        {
+            Direction.Up when Region.Contains(coord.Left) => true,
+            Direction.Right when Region.Contains(coord.Up) => true,
+            Direction.Down when Region.Contains(coord.Right) => true,
+            Direction.Left when Region.Contains(coord.Down) => true,
+            _ => false
         }
+    };
+
+    private static Coord NextCoord(Coord coord, Direction travelling) => travelling switch
+    {
+        Direction.Up => coord.Up,
+        Direction.Right => coord.Right,
+        Direction.Down => coord.Down,
+        _ => coord.Left
+    };
+
+    private (Direction direction, int initialSides, bool travelClockwise) InitializeTravel(Coord start)
+    {
+        if (start.Neighbours.Count(Region.Contains) == 1)
+        {
+            int nbIndex = start.Neighbours.Index().First(elem => Region.Contains(elem.Item)).Index;
+            Direction direction = (Direction)nbIndex;
+
+            bool travelClockwise = direction is Direction.Up or Direction.Left;
+            int initialSides = 2;
+
+            return (direction, initialSides, travelClockwise);
+        }
+
+        return (Direction.Down, 1, false);
     }
 
     private bool IsPillar(Coord coord) => coord.Neighbours.Count(Region.Contains) == 1;
 
-    private bool IsCorner(Coord coord)
-    {
-        if (coord.Neighbours.Count(Region.Contains) == 2)
-        {
-            var storedNeighbours = coord.Neighbours.Index()
-                                                   .Where(elem => Region.Contains(elem.Item))
-                                                   .ToArray();
-
-            return storedNeighbours switch
-            {
-            [(0, _), (1, _)] => true,
-            [(1, _), (0, _)] => true,
-            [(1, _), (2, _)] => true,
-            [(2, _), (1, _)] => true,
-            [(2, _), (3, _)] => true,
-            [(3, _), (2, _)] => true,
-            [(3, _), (0, _)] => true,
-            [(0, _), (3, _)] => true,
-                _ => false
-            };
-        }
-
-        return false;
-    }
-
     public static bool WithinBounds(Coord c, int maxRow, int maxCol) => c.Row >= 0 && c.Row < maxRow
                                                                       && c.Col >= 0 && c.Col < maxCol;
-
-    public static bool WithinBounds(Coord c, Span2D<char> map) => c.Row >= 0 && c.Row < map.Height
-                                                                && c.Col >= 0 && c.Col < map.Width;
 }
 
 public enum Direction

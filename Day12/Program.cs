@@ -13,7 +13,7 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day12/input.txt")
 };
 
-string[] input = File.ReadAllLines(filePaths["example3"]);
+string[] input = File.ReadAllLines(filePaths["challenge"]);
 
 #if PART1
 int resultOne = FencePricing.PartOne(input);

@@ -69,26 +69,6 @@ public static class FencePricing
         Console.WriteLine($"{perimeter.Id}: {perimeter.Region.Count} x {perimeter.Sides}\n");
         visited.UnionWith(perimeter.Region);
 
-        foreach (var innerRegion in GetInnerRegions(perimeter, visited))
-        {
-            price += innerRegion.Sides * innerRegion.Region.Count;
-            Console.WriteLine($"{innerRegion.Id}: {innerRegion.Region.Count} x {innerRegion.Sides}\n");
-        }
-
         return price;
-    }
-
-    private static IEnumerable<Perimeter2D> GetInnerRegions(Perimeter2D outer, HashSet<Coord> visited)
-    {
-        foreach (var inner in outer.InnerRegions)
-        {
-            foreach (var deeper in GetInnerRegions(inner, visited))
-            {
-                yield return deeper;
-            }
-
-            visited.UnionWith(inner.Region);
-            yield return inner;
-        }
     }
 }

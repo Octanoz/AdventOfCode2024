@@ -112,7 +112,7 @@ public class Day12Tests
     public void FencePricing_PartTwo_TestData4_Should_Return_236()
     {
         //Arrange
-        string[] input = File.ReadAllLines(testPath3);
+        string[] input = File.ReadAllLines(testPath4);
 
 
         //Act
@@ -126,7 +126,7 @@ public class Day12Tests
     public void FencePricing_PartTwo_TestData4_Should_Return_368()
     {
         //Arrange
-        string[] input = File.ReadAllLines(testPath3);
+        string[] input = File.ReadAllLines(testPath5);
 
 
         //Act
@@ -134,5 +134,19 @@ public class Day12Tests
 
         //Assert
         Assert.Equal(368, result);
+    }
+
+    [Fact]
+    public void FencePricing_PartTwo_PuzzleData_Should_Return_862714()
+    {
+        //Arrange
+        string[] input = File.ReadAllLines(puzzlePath);
+
+
+        //Act
+        int result = FencePricing.PartTwo(input);
+
+        //Assert
+        Assert.Equal(862714, result);
     }
 }
