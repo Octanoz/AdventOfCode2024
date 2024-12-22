@@ -1,0 +1,147 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using Point = (int x, int y);
+
+public readonly struct Button(int xMove, int yMove)
+{
+    private readonly int xMove = xMove;
+    private readonly int yMove = yMove;
+
+    public (int, int) Push(int a, int b) => (a + xMove, b + yMove);
+
+    public Point Push(Point p) => new(p.x + xMove, p.y + yMove);
+    public Point Undo(Point p) => new(p.x - xMove, p.y - yMove);
+}
+
+#!csharp
+
+public class Machine(params int[] moves)
+{
+    private readonly Button buttonA = new(moves[0], moves[1]);
+    private readonly Button buttonB = new(moves[2], moves[3]);
+    private int totalCost = 0;
+
+    public Point PrizeLocation { get; } = new(moves[4], moves[5]);
+    public Point ClawLocation { get; private set; } = new(0, 0);
+
+    public void PressA() => ClawLocation = PushButton('A', ClawLocation);
+    public void UndoA() => ClawLocation = UndoButton('A', ClawLocation);
+    public void PressB() => ClawLocation = PushButton('B', ClawLocation);
+    public void UndoB() => ClawLocation = UndoButton('B', ClawLocation);
+
+    private Point PushButton(char id, Point coord)
+    {
+        Pay(id);
+
+        if (id is 'A')
+        {
+            return PressButtonA(coord);
+        }
+        else
+        {
+            return PressButtonB(coord);
+        }
+    }
+
+    private Point UndoButton(char id, Point coord)
+    {
+        UndoPay(id);
+
+        if (id is 'A')
+        {
+            return UndoButtonA(coord);
+        }
+        else
+        {
+            return UndoButtonB(coord);
+        }
+    }
+
+    private void Pay(char id) => totalCost += id is 'A' ? 3 : 1;
+    private void UndoPay(char id) => totalCost -= id is 'A' ? 3 : 1;
+
+    private (int, int) PressButtonA(int x, int y) => buttonA.Push(x, y);
+    private Point PressButtonA(Point p) => buttonA.Push(p);
+    private Point UndoButtonA(Point coord) => buttonA.Undo(coord);
+
+    private (int, int) PressButtonB(int x, int y) => buttonB.Push(x, y);
+    private Point PressButtonB(Point p) => buttonB.Push(p);
+    private Point UndoButtonB(Point coord) => buttonB.Undo(coord);
+}
+
+#!csharp
+
+using System.Text.RegularExpressions;
+
+string multiLine =
+"""
+Button A: X+94, Y+34
+Button B: X+22, Y+67
+Prize: X=8400, Y=5400
+
+Button A: X+26, Y+66
+Button B: X+67, Y+21
+Prize: X=12748, Y=12176
+
+Button A: X+17, Y+86
+Button B: X+84, Y+37
+Prize: X=7870, Y=6450
+
+Button A: X+69, Y+23
+Button B: X+27, Y+71
+Prize: X=18641, Y=10279
+""";
+
+string pattern = @"(?=X[=+](?<X>\d+))|(?=Y[=+](?<Y>\d+))";
+
+foreach (Match match in Regex.Matches(multiLine, pattern))
+{
+    if (match.Groups["X"].Success)
+    {
+        Console.WriteLine($"Found X: {match.Groups["X"]} at {match.Groups["X"].Index}, with a length of {match.Groups["X"].Length}");
+    }
+    
+    if (match.Groups["Y"].Success)
+    {
+        Console.WriteLine($"Found Y: {match.Groups["Y"]} at {match.Groups["Y"].Index}, with a length of {match.Groups["Y"].Length}");
+    }
+}
+
+#!csharp
+
+#r "nuget: SuperLinq"
+
+#!csharp
+
+using SuperLinq;
+
+int targetRow = 5400;
+int targetCol =  8400;
+int limit = 280;
+
+int moveRowA = 34;
+int moveColA = 94;
+
+int moveRowB = 67;
+int moveColB = 22;
+
+var seqA = Enumerable.Range(0, 101).Select(n => (n * moveColA, n * moveRowA));
+var seqB = Enumerable.Range(0, 101).Select(n => (n * moveColB, n * moveRowB));
+
+var validCombos = seqA.Cartesian(seqB)
+                      .Where(pair => pair.Item1.Item1 + pair.Item2.Item1 == targetCol
+                                  && pair.Item1.Item2 + pair.Item2.Item2 == targetRow);
+
+var resultA = validCombos.Select(pair => pair.Item1)
+                         .Select(tup => (tup.Item1 / moveColA + tup.Item2 / moveRowA) / 2);
+var resultB = validCombos.Select(pair => pair.Item2)
+                         .Select(tup => (tup.Item1 / moveColB + tup.Item2 / moveRowB) / 2);
+
+Console.WriteLine(validCombos.Count());
+// validCombos.Display();
+resultA.Display();
+resultB.Display();
