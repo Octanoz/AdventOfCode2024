@@ -119,15 +119,24 @@ foreach (Match match in Regex.Matches(multiLine, pattern))
 
 using SuperLinq;
 
-int targetRow = 5400;
-int targetCol =  8400;
-int limit = 280;
+// int targetRow = 5400;
+// int targetCol =  8400;
+// int limit = 280;
 
-int moveRowA = 34;
-int moveColA = 94;
+// int moveRowA = 34;
+// int moveColA = 94;
 
-int moveRowB = 67;
-int moveColB = 22;
+// int moveRowB = 67;
+// int moveColB = 22;
+
+int targetRow = 6450;
+int targetCol = 7870;
+
+int moveRowA = 86;
+int moveColA = 17;
+
+int moveRowB = 37;
+int moveColB = 84;
 
 var seqA = Enumerable.Range(0, 101).Select(n => (n * moveColA, n * moveRowA));
 var seqB = Enumerable.Range(0, 101).Select(n => (n * moveColB, n * moveRowB));
@@ -141,6 +150,12 @@ var resultA = validCombos.Select(pair => pair.Item1)
 var resultB = validCombos.Select(pair => pair.Item2)
                          .Select(tup => (tup.Item1 / moveColB + tup.Item2 / moveRowB) / 2);
 
+var zippedResult = resultA.Zip(resultB, (first, second) => (first, second));
+foreach (var res in zippedResult)
+{
+    Console.WriteLine(res);
+    Console.WriteLine($"Tokens needed: {res.Item1 * 3 + res.Item2}");
+}
 Console.WriteLine(validCombos.Count());
 // validCombos.Display();
 resultA.Display();
