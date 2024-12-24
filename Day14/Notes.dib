@@ -1,0 +1,98 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.Threading;
+using Point = (int Row, int Col);
+
+int startCol = 0;
+int startRow = 4;
+int colSpeed = 3;
+int rowSpeed = -3;
+
+int maxRow = 7;
+int maxCol = 11;
+
+Point currentRegular = (startRow, startCol);
+Point currentPositive = (startRow, startCol);
+
+for (int i = 0; i < 100; i++)
+{
+    var (regularRow, regularCol) = currentRegular;
+    var (positiveRow, positiveCol) = currentPositive;
+
+    int newRegularRow = rowSpeed < 0 ? ((regularRow - rowSpeed) + maxRow) % maxRow : (regularRow + rowSpeed) % maxRow;
+    int newPositiveRow = rowSpeed < 0 ? (positiveRow + maxRow - rowSpeed) % maxRow : (positiveRow + rowSpeed) % maxRow;
+
+    int newRegularCol = colSpeed < 0 ? ((regularCol - colSpeed) + maxCol) % maxCol : (regularCol + colSpeed) % maxCol;
+    int newPositiveCol = colSpeed < 0 ? (positiveCol + maxCol - rowSpeed) % maxCol : (positiveCol + colSpeed) % maxCol;
+
+    currentRegular = (newRegularRow, newRegularCol);
+    currentPositive = (newPositiveRow, newPositiveCol);
+
+    // if (true)
+    if (i % 10 == 0)
+    {
+        Console.WriteLine($"{currentRegular} | {currentPositive}");
+
+        Thread.Sleep(2000);
+    }
+}
+
+currentRegular.Display();
+currentPositive.Display();
+
+#!csharp
+
+int position = 2;
+int speed = 2;
+
+int newPosition = (position + (speed * 100)) % 11;
+
+for (int i = 0; i < 5; i++)
+{
+    position += speed;
+
+    Console.Write($"{position} ");
+}
+
+position %= 11;
+
+
+
+position.Display();
+newPosition.Display();
+
+#!csharp
+
+int[] robotsPerQuadrant = { 221, 265, 222, 243 };
+int result = robotsPerQuadrant.Aggregate(1, (acc, next) => acc * next);
+Console.WriteLine(result);
+
+#!csharp
+
+int[][] grid = Enumerable.Range(0, 7).Select(_ => Enumerable.Repeat(0, 11).ToArray()).ToArray();
+
+for (int i = 0; i < grid.Length; i++)
+{
+    for (int j = 0; j < grid[i].Length; j++)
+    {
+        grid[i][j] = i * j;
+    }
+}
+
+int rowMid = grid.Length / 2;
+int colMid = grid[0].Length / 2;
+
+(rowMid, colMid).Display();
+
+// grid.Display();
+
+#!csharp
+
+int width = Console.WindowWidth;
+int largestWidth = Console.LargestWindowWidth;
+
+Console.WriteLine($"{width} {largestWidth}");

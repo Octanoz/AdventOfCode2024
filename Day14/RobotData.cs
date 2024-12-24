@@ -19,14 +19,15 @@ public static class RobotData
             {
                 if (groups["position"].Success)
                 {
-                    int col = int.Parse(groups["position"].Captures[0].Value);
-                    int row = int.Parse(groups["position"].Captures[1].Value);
+                    int row = int.Parse(groups["row"].Value);
+                    int col = int.Parse(groups["col"].Value);
 
                     position = new(row, col);
+                    continue;
                 }
 
-                int speedCol = int.Parse(groups["speed"].Captures[0].Value);
-                int speedRow = int.Parse(groups["speed"].Captures[1].Value);
+                int speedRow = int.Parse(groups["row"].Value);
+                int speedCol = int.Parse(groups["col"].Value);
 
                 robots.Add(new(position, speedCol, speedRow));
             }
@@ -38,6 +39,9 @@ public static class RobotData
 
 public partial class Helpers
 {
-    [GeneratedRegex(@"(?<=p=(?<position>(?<col>\d+),(?<row>\d+)))|(?<=v=(?<speed>(?<col>-?\d+),(?<row>-?\d+)))")]
+    [GeneratedRegex(@"(\d+)")]
+    public static partial Regex Numbers();
+
+    [GeneratedRegex(@"(?<position>p=(?<col>\d+),(?<row>\d+))|(?<speed>v=(?<col>-?\d+),(?<row>-?\d+))")]
     public static partial Regex Robots();
 }

@@ -1,4 +1,4 @@
-﻿namespace DAy14.Tests;
+﻿namespace Day15.Tests;
 
 public class UnitTest1
 {

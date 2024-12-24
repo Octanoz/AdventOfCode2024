@@ -8,4 +8,10 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day14/input.txt")
 };
 
-List<Robot> robotList = RobotData.ParseRobots(filePaths["example"]);
+// int result1 = Solver.PartOne(filePaths["challenge"], 103, 101);
+
+// long result1 = Solver.PartOne(filePaths["example1"], 7, 11);
+
+Solver.PartTwo(filePaths["challenge"], 103, 101);
+
+// Console.WriteLine(result1);

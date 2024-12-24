@@ -143,6 +143,20 @@ public static class GridExtensions
              .Select(sArray => sArray.Select(int.Parse).ToArray())
              .ToArray();
 
+    public static char[][] JaggedCharArrayBlank(int maxRow, int maxCol) =>
+        Enumerable.Range(0, maxRow)
+                  .Select(_ => Enumerable.Repeat('.', maxCol).ToArray())
+                  .ToArray();
+
+    public static int[][] JaggedIntArrayBlank(int maxRow, int maxCol) =>
+        Enumerable.Range(0, maxRow)
+                  .Select(_ => Enumerable.Repeat(0, maxCol).ToArray())
+                  .ToArray();
+    public static int[][] JaggedIntArrayDivider(string[] input, char divider) =>
+        input.Select(s => s.Split(divider))
+             .Select(sArray => sArray.Select(int.Parse).ToArray())
+             .ToArray();
+
     public static void Draw2DGrid<T>(this T[,] grid)
     {
         int rows = grid.GetLength(0);
@@ -231,4 +245,61 @@ public static class GridExtensions
         }
     }
 
+    public static void DrawIntJaggedGrid(this int[][] grid)
+    {
+        int maxRow = grid.Length;
+        int maxCol = grid[0].Length;
+
+        for (int row = 0; row < maxRow; row++)
+        {
+            for (int col = 0; col < maxCol; col++)
+            {
+                int current = grid[row][col];
+
+                if (current is 0)
+                {
+                    Console.Write(' ');
+                }
+                else Console.Write(current);
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    public static T[,] ConvertJaggedTo2D<T>(this T[][] grid)
+    {
+        int rows = grid.Length;
+        int cols = grid[0].Length;
+
+        T[,] result = new T[rows, cols];
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                result[i, j] = grid[i][j];
+            }
+        }
+
+        return result;
+    }
+
+    public static T[][] Convert2DToJagged<T>(this T[,] grid)
+    {
+        int rows = grid.GetLength(0);
+        int cols = grid.GetLength(1);
+
+        T[][] result = new T[rows][];
+        for (int i = 0; i < rows; i++)
+        {
+            result[i] = new T[cols];
+            for (int j = 0; j < cols; j++)
+            {
+                result[i][j] = grid[i, j];
+            }
+        }
+
+        return result;
+    }
 }
