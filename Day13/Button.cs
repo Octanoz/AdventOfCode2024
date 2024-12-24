@@ -1,17 +1,13 @@
 using AdventUtilities;
+using AdventUtilities.LongCoordinates;
 
 namespace Day13;
 
-public readonly struct Button(int xMove, int yMove)
+public readonly struct Button(CoordL Move)
 {
-    private readonly int rowMove = yMove;
-    private readonly int colMove = xMove;
+    public CoordL Push(CoordL c) => c + Move;
+    public CoordL Undo(CoordL c) => c + Move;
 
-    public (int, int) Push(int a, int b) => (a + rowMove, b + colMove);
-
-    public Coord Push(Coord c) => c with { Row = c.Row + rowMove, Col = c.Col + colMove };
-    public Coord Undo(Coord c) => c with { Row = c.Row - rowMove, Col = c.Col - colMove };
-
-    public int GetRowMove() => rowMove;
-    public int GetColMove() => colMove;
+    public long GetRowMove() => Move.Row;
+    public long GetColMove() => Move.Col;
 }

@@ -4,77 +4,6 @@
 
 #!csharp
 
-using Point = (int x, int y);
-
-public readonly struct Button(int xMove, int yMove)
-{
-    private readonly int xMove = xMove;
-    private readonly int yMove = yMove;
-
-    public (int, int) Push(int a, int b) => (a + xMove, b + yMove);
-
-    public Point Push(Point p) => new(p.x + xMove, p.y + yMove);
-    public Point Undo(Point p) => new(p.x - xMove, p.y - yMove);
-}
-
-#!csharp
-
-public class Machine(params int[] moves)
-{
-    private readonly Button buttonA = new(moves[0], moves[1]);
-    private readonly Button buttonB = new(moves[2], moves[3]);
-    private int totalCost = 0;
-
-    public Point PrizeLocation { get; } = new(moves[4], moves[5]);
-    public Point ClawLocation { get; private set; } = new(0, 0);
-
-    public void PressA() => ClawLocation = PushButton('A', ClawLocation);
-    public void UndoA() => ClawLocation = UndoButton('A', ClawLocation);
-    public void PressB() => ClawLocation = PushButton('B', ClawLocation);
-    public void UndoB() => ClawLocation = UndoButton('B', ClawLocation);
-
-    private Point PushButton(char id, Point coord)
-    {
-        Pay(id);
-
-        if (id is 'A')
-        {
-            return PressButtonA(coord);
-        }
-        else
-        {
-            return PressButtonB(coord);
-        }
-    }
-
-    private Point UndoButton(char id, Point coord)
-    {
-        UndoPay(id);
-
-        if (id is 'A')
-        {
-            return UndoButtonA(coord);
-        }
-        else
-        {
-            return UndoButtonB(coord);
-        }
-    }
-
-    private void Pay(char id) => totalCost += id is 'A' ? 3 : 1;
-    private void UndoPay(char id) => totalCost -= id is 'A' ? 3 : 1;
-
-    private (int, int) PressButtonA(int x, int y) => buttonA.Push(x, y);
-    private Point PressButtonA(Point p) => buttonA.Push(p);
-    private Point UndoButtonA(Point coord) => buttonA.Undo(coord);
-
-    private (int, int) PressButtonB(int x, int y) => buttonB.Push(x, y);
-    private Point PressButtonB(Point p) => buttonB.Push(p);
-    private Point UndoButtonB(Point coord) => buttonB.Undo(coord);
-}
-
-#!csharp
-
 using System.Text.RegularExpressions;
 
 string multiLine =
@@ -123,40 +52,208 @@ using SuperLinq;
 // int targetCol =  8400;
 // int limit = 280;
 
-// int moveRowA = 34;
-// int moveColA = 94;
+// int yMoveA = 34;
+// int xMoveA = 94;
 
-// int moveRowB = 67;
-// int moveColB = 22;
+// int yMoveB = 67;
+// int xMoveB = 22;
 
-int targetRow = 6450;
-int targetCol = 7870;
+int yTarget = 6450;
+int xTarget = 7870;
 
-int moveRowA = 86;
-int moveColA = 17;
+int yMoveA = 86;
+int xMoveA = 17;
 
-int moveRowB = 37;
-int moveColB = 84;
+int yMoveB = 37;
+int xMoveB = 84;
 
-var seqA = Enumerable.Range(0, 101).Select(n => (n * moveColA, n * moveRowA));
-var seqB = Enumerable.Range(0, 101).Select(n => (n * moveColB, n * moveRowB));
+var seqA = Enumerable.Range(0, 200).Select(n => (n * xMoveA, n * yMoveA));
+var seqB = Enumerable.Range(0, 200).Select(n => (n * xMoveB, n * yMoveB));
 
 var validCombos = seqA.Cartesian(seqB)
-                      .Where(pair => pair.Item1.Item1 + pair.Item2.Item1 == targetCol
-                                  && pair.Item1.Item2 + pair.Item2.Item2 == targetRow);
+                      .Where(pair => pair.Item1.Item1 + pair.Item2.Item1 == xTarget
+                                  && pair.Item1.Item2 + pair.Item2.Item2 == yTarget);
 
-var resultA = validCombos.Select(pair => pair.Item1)
-                         .Select(tup => (tup.Item1 / moveColA + tup.Item2 / moveRowA) / 2);
-var resultB = validCombos.Select(pair => pair.Item2)
-                         .Select(tup => (tup.Item1 / moveColB + tup.Item2 / moveRowB) / 2);
+var resultA = validCombos.Select(pair => (pair.Item1.Item1 / xMoveA, pair.Item1.Item2 / yMoveA))
+                         .Where(tup => tup.Item1 == tup.Item2)
+                         .Select(tup => tup.Item1);
 
-var zippedResult = resultA.Zip(resultB, (first, second) => (first, second));
-foreach (var res in zippedResult)
-{
-    Console.WriteLine(res);
-    Console.WriteLine($"Tokens needed: {res.Item1 * 3 + res.Item2}");
-}
-Console.WriteLine(validCombos.Count());
+var resultB = validCombos.Select(pair => (pair.Item2.Item1 / xMoveB, pair.Item2.Item2 / yMoveB))
+                            .Where(tup => tup.Item1 == tup.Item2)
+                            .Select(tup => tup.Item1);
 // validCombos.Display();
 resultA.Display();
 resultB.Display();
+
+#!csharp
+
+// long prizeShift = 10_000_000_000_000;
+// long maxStepsA = prizeShift / xMoveA;
+// long maxStepsB = prizeShift / xMoveB;
+// long maxSteps = (long)Math.Max(maxStepsA, maxStepsB);
+
+int summat = 10001;
+string summatString = Convert.ToString(summat, 2).PadLeft(31, '0');
+summatString.Display();
+
+#!csharp
+
+/* Button A: X+26, Y+66
+Button B: X+67, Y+21
+Prize: X=12748, Y=12176 */
+
+long yTarget = 10000000012176;
+long xTarget = 10000000007870;
+
+long yMoveA = 66;
+long xMoveA = 26;
+
+long yMoveB = 21;
+long xMoveB = 67;
+
+// Prize shift amount
+long prizeShift = 10000000000000;
+
+// Calculate the number of steps required to reach the prize location
+long minStepsA = prizeShift / xMoveA;
+long minStepsB = prizeShift / xMoveB;
+
+// Use a reasonable buffer to avoid overshooting too far
+long stepBuffer = 1000000; // Buffer to expand the range
+
+// Calculate the actual search range based on the prize shift and movement
+long lowerBoundA = Math.Max(0, minStepsA - stepBuffer); 
+long upperBoundA = minStepsA + stepBuffer;
+long lowerBoundB = Math.Max(0, minStepsB - stepBuffer); 
+long upperBoundB = minStepsB + stepBuffer;
+
+// Now we create the sequences for the more targeted range
+var seqA = Enumerable.Range((int)lowerBoundA, (int)(upperBoundA - lowerBoundA + 1))
+                     .Select(n => (n * xMoveA, n * yMoveA));
+
+var seqB = Enumerable.Range((int)lowerBoundB, (int)(upperBoundB - lowerBoundB + 1))
+                     .Select(n => (n * xMoveB, n * yMoveB));
+
+// Now process the Cartesian product, but only for the smaller range
+var validCombos = seqA.Cartesian(seqB)
+                      .Where(pair => pair.Item1.Item1 + pair.Item2.Item1 == xTarget
+                                  && pair.Item1.Item2 + pair.Item2.Item2 == yTarget);
+
+// Process valid combinations (same as before)
+var resultA = validCombos.Select(pair => (pair.Item1.Item1 / xMoveA, pair.Item1.Item2 / yMoveA))
+                         .Where(tup => tup.Item1 == tup.Item2)
+                         .Select(tup => tup.Item1);
+
+var resultB = validCombos.Select(pair => (pair.Item2.Item1 / xMoveB, pair.Item2.Item2 / yMoveB))
+                         .Where(tup => tup.Item1 == tup.Item2)
+                         .Select(tup => tup.Item1);
+
+var result = resultA.Zip(resultB, (first, second) => (first, second)).ToList();
+
+#!csharp
+
+using Microsoft.DotNet.Interactive;
+
+async Task BitShiftInteractive()
+{
+    long num = 69;
+    bool continueBitShifting = true;
+
+    while (continueBitShifting)
+    {
+        // Display current value
+        Console.WriteLine($"Current value: {num}");
+
+        // Prompt for user input
+        var input = await Kernel.GetInputAsync("Press 'y' to bit shift left or 'n' to stop.");
+
+        if (input?.ToLower() == "y")
+        {
+            num <<= 1;  // Perform bit shift
+        }
+        else if (input?.ToLower() == "n")
+        {
+            continueBitShifting = false;  // Exit the loop if user presses 'n'
+        }
+        else
+        {
+            Console.WriteLine("Invalid input, please press 'y' or 'n'.");
+        }
+    }
+
+    Console.WriteLine("Exiting bit shifting process.");
+}
+
+// Run the interactive bit shifting
+await BitShiftInteractive();
+
+#!csharp
+
+using Microsoft.DotNet.Interactive;
+
+async Task BitShiftRightInteractive()
+{
+    long destination = 10000000012748;
+    int times = 0;
+    bool continueBitShifting = true;
+
+    while (continueBitShifting)
+    {
+        // Display current value
+        Console.WriteLine($"Current value: {destination} after {times} bit shifting");
+
+        // Prompt for user input
+        var input = await Kernel.GetInputAsync("Press 'y' to bit shift left or 'n' to stop.");
+
+        if (input?.ToLower() == "y")
+        {
+            destination >>= 1;  // Perform bit shift
+            times++;
+        }
+        else if (input?.ToLower() == "n")
+        {
+            continueBitShifting = false;  // Exit the loop if user presses 'n'
+        }
+        else
+        {
+            Console.WriteLine("Invalid input, please press 'y' or 'n'.");
+        }
+    }
+}
+
+// Run the interactive right bit-shifting
+await BitShiftRightInteractive();
+
+#!csharp
+
+using System.Threading;
+
+/*10000000012176
+Current value: 291 after 35 bit shifting
+Current value: 145 after 36 bit shifting
+Current value: 72 after 37 bit shifting";*/
+
+// string destinationY = "10101";
+// var destY = Convert.ToInt64(destinationY, 2);
+
+ulong number = 69;
+int times = 0;
+while (true)
+{
+    checked
+    {
+        number <<= 1;
+    }
+
+    Console.WriteLine($"{number} after bit shifting {++times} times");
+
+    if (times % 3 == 0)
+    {
+        Console.Clear();
+    }
+
+
+    Thread.Sleep(5000);
+}
+
+// destY.Display();

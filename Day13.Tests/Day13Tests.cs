@@ -48,4 +48,30 @@ public class Day13Tests
         //Assert
         Assert.Equal(480, result);
     }
+
+    [Fact]
+    public void PartOne_Puzzle_Should_Return_29201()
+    {
+        //Arrange
+
+
+        //Act
+        int result = Solver.PartOne(puzzlePath);
+
+        //Assert
+        Assert.Equal(29201, result);
+    }
+
+    [Fact]
+    public void PartTwo_Puzzle_Should_Return_104140871044942()
+    {
+        //Arrange
+
+
+        //Act
+        long result = Solver.PartTwo(puzzlePath);
+
+        //Assert
+        Assert.Equal(104140871044942, result);
+    }
 }
