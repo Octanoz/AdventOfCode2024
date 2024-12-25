@@ -59,5 +59,6 @@ public class Defragmenter(string input)
         return fileBlocks[..negIndex];
     }
 
-    private static long CalculateChecksum(int[] compactFile) => compactFile.Index().Sum(elem => (long)elem.Index * elem.Item);
+    private static long CalculateChecksum(int[] compactFile) =>
+        compactFile.Index().Sum(elem => (long)elem.Index * elem.Item);
 }

@@ -15,9 +15,22 @@ public class Day14Tests
 
 
         //Act
-        long result = Solver.PartOne(testPath, 7, 11);
+        int result = Solver.PartOne(testPath, 7, 11);
 
         //Assert
         Assert.Equal(12, result);
+    }
+
+    [Fact]
+    public void Solver_PartOne_Puzzle_Should_Return_228410028()
+    {
+        //Arrange
+
+
+        //Act
+        int result = Solver.PartOne(puzzlePath, 103, 101);
+
+        //Assert
+        Assert.Equal(228410028, result);
     }
 }

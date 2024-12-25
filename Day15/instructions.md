@@ -10,6 +10,8 @@ These lanternfish seem so anxious because they have lost control of the robot th
 
 Right now, none of the lanternfish are brave enough to swim up to an unpredictable robot so they could shut it off. However, if you could anticipate the robot's movements, maybe they could find a safe option.
 
+## Rules
+
 The lanternfish already have a map of the warehouse and a list of movements the robot will attempt to make (your puzzle input). The problem is that the movements will sometimes fail as boxes are shifted around, making the actual movements of the robot difficult to predict.
 
 For example:
@@ -36,9 +38,11 @@ For example:
     ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
     v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
 
-As the robot (@) attempts to move, if there are any boxes (O) in the way, the robot will also attempt to push those boxes. However, if this action would cause the robot or a box to move into a wall (#), nothing moves instead, including the robot. The initial positions of these are shown on the map at the top of the document the lanternfish gave you.
+As the robot `@` attempts to move, if there are any boxes `O` in the way, the robot will also attempt to push those boxes. However, if this action would cause the robot or a box to move into a wall `#`, nothing moves instead, including the robot. The initial positions of these are shown on the map at the top of the document the lanternfish gave you.
 
-The rest of the document describes the moves (^ for up, v for down, < for left, > for right) that the robot will attempt to make, in order. (The moves form a single giant sequence; they are broken into multiple lines just to make copy-pasting easier. Newlines within the move sequence should be ignored.)
+The rest of the document describes the moves (`^` for up, `v` for down, `<` for left, `>` for right) that the robot will attempt to make, in order. (The moves form a single giant sequence; they are broken into multiple lines just to make copy-pasting easier. Newlines within the move sequence should be ignored.)
+
+## Examples
 
 Here is a smaller example to get started:
 
@@ -244,14 +248,21 @@ The larger example has many more moves; after the robot has finished those moves
     #OO....OO#
     ##########
 
-The lanternfish use their own custom Goods Positioning System (GPS for short) to track the locations of the boxes. The GPS coordinate of a box is equal to 100 times its distance from the top edge of the map plus its distance from the left edge of the map. (This process does not stop at wall tiles; measure all the way to the edges of the map.)
+The lanternfish use their own custom Goods Positioning System (GPS for short) to track the locations of the boxes.
 
-So, the box shown below has a distance of 1 from the top edge of the map and 4 from the left edge of the map, resulting in a GPS coordinate of 100 * 1 + 4 = 104.
+The `GPS` coordinate of a box is equal to `100` times its distance from the top edge of the map plus its distance from the left edge of the map. (This process does not stop at wall tiles; measure all the way to the edges of the map.)
+
+So, the box shown below has a distance of 1 from the top edge of the map and 4 from the left edge of the map, resulting in a GPS coordinate of $100 \times 1 + 4 = 104$.
 
     #######
     #...O..
     #......
     
-The lanternfish would like to know the sum of all boxes' GPS coordinates after the robot finishes moving. In the larger example, the sum of all boxes' GPS coordinates is 10092. In the smaller example, the sum is 2028.
+The lanternfish would like to know the sum of all boxes' GPS coordinates after the robot finishes moving.
+
+In the larger example, the sum of all boxes' GPS coordinates is $10092$.  
+In the smaller example, the sum is $2028$.
+
+## Challenge 1
 
 Predict the motion of the robot and boxes in the warehouse. After the robot is finished moving, what is the sum of all boxes' GPS coordinates?

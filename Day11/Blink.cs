@@ -33,7 +33,7 @@ public class Blink(string input)
     public long PartTwo(int blinkCount)
     {
         Dictionary<long, long> currentCounts = linkedStones.GroupBy(n => n)
-                                                          .ToDictionary(g => g.Key, g => (long)g.Count());
+                                                           .ToDictionary(g => g.Key, g => (long)g.Count());
 
         Dictionary<long, long> newCounts = [];
         for (int i = 0; i < blinkCount; i++)
@@ -76,7 +76,6 @@ public class Blink(string input)
         while (currentNode is not null)
         {
             var nextNode = currentNode.Next;
-
             switch (currentNode.Value)
             {
                 case 0:
@@ -99,9 +98,7 @@ public class Blink(string input)
     }
 
     private static long Divisor(long num) => (long)Math.Pow(10, num);
-
     private static bool HasEvenDigitCount(long num) => DigitCount(num) % 2 == 0;
-
     private static int DigitCount(long num) => (int)Math.Floor(Math.Log10(num) + 1);
 
     private static List<long> SplitStone(long num)

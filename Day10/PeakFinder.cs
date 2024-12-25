@@ -55,13 +55,13 @@ public static class PeakFinder
 
     public static int PartTwo(string[] input)
     {
-        IEnumerable<Coord> trailheads = input.Index().SelectMany(row => row.Item.Index()
-                                                                                .Where(col => col.Item is '0')
-                                                                                .Select(col => new Coord(row.Index, col.Index)));
+        IEnumerable<Coord> trailheads =
+            input.Index().SelectMany(row => row.Item.Index()
+                                                    .Where(col => col.Item is '0')
+                                                    .Select(col => new Coord(row.Index, col.Index)));
 
         char[,] map = GridExtensions.New2DGridWithDimensions<char>(input, out int maxRow, out int maxCol);
 
-        // Dictionary<Coord, HashSet<Coord>> trailheadRoutes = [];
         Span2D<char> mapSpan = map;
         Queue<(Coord, Coord)> trails = [];
 

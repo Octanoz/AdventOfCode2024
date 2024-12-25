@@ -52,6 +52,8 @@ public class Perimeter2D(Coord firstCoord)
     public int CalculateSides(Span2D<char> map, HashSet<(Coord start, Coord end)> edges)
     {
         HashSet<Coord> visited = [];
+
+        //Pillar is single cell with just one neighbour in the region list, aka perfect starting point
         if (!IsPillar(firstCoord) && Region.Any(IsPillar))
         {
             firstCoord = Region.Where(IsPillar).OrderBy(c => c.Row).First();
@@ -70,18 +72,14 @@ public class Perimeter2D(Coord firstCoord)
             if (PreferredCoordAvailable(current, dir, travelClockwise))
             {
                 sides++;
-                dir = travelClockwise
-                    ? (Direction)(((int)dir + 3) & 3)
-                    : (Direction)(((int)dir + 1) & 3);
+                dir = DirectionForPreferredPath(dir, travelClockwise);
             }
 
             Coord next = NextCoord(current, dir);
             if (!Region.Contains(next))
             {
                 sides++;
-                dir = travelClockwise
-                    ? (Direction)(((int)dir + 1) & 3)
-                    : (Direction)(((int)dir + 3) & 3);
+                dir = DirectionForBlockedPath(dir, travelClockwise);
 
                 continue;
             }
@@ -89,14 +87,11 @@ public class Perimeter2D(Coord firstCoord)
             current = next;
         }
 
-        edges.RemoveWhere(edge => edge.end.Row < Region.Min(c => c.Row)
-                               || edge.end.Row > Region.Max(c => c.Row)
-                               || edge.end.Col < Region.Min(c => c.Col)
-                               || edge.end.Col > Region.Max(c => c.Col));
+        edges = CleanEdges(edges); //Remove all coordinates outside the region
 
-        foreach (var edge in edges.Where(edge => !visited.Contains(edge.start)).OrderByDescending(e => edges.Count(x => x.end == e.end)))
+        foreach (var (_, end) in edges.Where(edge => !visited.Contains(edge.start)).OrderByDescending(e => edges.Count(x => x.end == e.end)))
         {
-            sides += FindInnerSides(map, edge.end, visited);
+            sides += FindInnerSides(map, end, visited);
         }
 
         return sides;
@@ -107,11 +102,13 @@ public class Perimeter2D(Coord firstCoord)
         if (!visited.Add(current))
             return 0;
 
+        //single cell
         if (current.Neighbours.All(Region.Contains))
         {
             return 4;
         }
 
+        //Navigate to a corner to ensure the expand process is successful
         while (!Region.Contains(current.Up) && !Region.Contains(current.Left))
         {
             if (!Region.Contains(current.Up))
@@ -136,6 +133,17 @@ public class Perimeter2D(Coord firstCoord)
 
         return innerPerimeter.Sides;
     }
+
+    private static Direction DirectionForPreferredPath(Direction dir, bool clockwise) =>
+        clockwise
+            ? (Direction)(((int)dir + 3) & 3)
+            : (Direction)(((int)dir + 1) & 3);
+
+    private static Direction DirectionForBlockedPath(Direction dir, bool clockwise) =>
+        clockwise
+            ? (Direction)(((int)dir + 1) & 3)
+            : (Direction)(((int)dir + 3) & 3);
+
     private bool PreferredCoordAvailable(Coord coord, Direction travelling, bool travelClockwise = false) => travelClockwise switch
     {
         false => travelling switch
@@ -167,7 +175,7 @@ public class Perimeter2D(Coord firstCoord)
 
     private (Direction direction, int initialSides, bool travelClockwise) InitializeTravel(Coord start)
     {
-        if (start.Neighbours.Count(Region.Contains) == 1)
+        if (IsPillar(start))
         {
             int nbIndex = start.Neighbours.Index().First(elem => Region.Contains(elem.Item)).Index;
             Direction direction = (Direction)nbIndex;
@@ -181,10 +189,19 @@ public class Perimeter2D(Coord firstCoord)
         return (Direction.Down, 1, false);
     }
 
-    private bool IsPillar(Coord coord) => coord.Neighbours.Count(Region.Contains) == 1;
+    private HashSet<(Coord, Coord)> CleanEdges(HashSet<(Coord start, Coord end)> edges)
+    {
+        edges.RemoveWhere(edge => edge.end.Row < Region.Min(c => c.Row)
+                               || edge.end.Row > Region.Max(c => c.Row)
+                               || edge.end.Col < Region.Min(c => c.Col)
+                               || edge.end.Col > Region.Max(c => c.Col));
 
+        return edges;
+    }
+
+    private bool IsPillar(Coord coord) => coord.Neighbours.Count(Region.Contains) == 1;
     public static bool WithinBounds(Coord c, int maxRow, int maxCol) => c.Row >= 0 && c.Row < maxRow
-                                                                      && c.Col >= 0 && c.Col < maxCol;
+                                                                     && c.Col >= 0 && c.Col < maxCol;
 }
 
 public enum Direction

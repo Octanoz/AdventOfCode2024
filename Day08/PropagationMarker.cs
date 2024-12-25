@@ -27,7 +27,7 @@ public class PropagationMarker(string[] input)
             matrix[coord.Row][coord.Col] = '#';
         }
 
-        GridExtensions.DrawJaggedGridTight(matrix);
+        matrix.DrawJaggedGridTight();
 
         foreach (var antennaList in antennae.Values)
         {
