@@ -2,22 +2,51 @@ using AdventUtilities;
 
 namespace Day15;
 
-public class Box(Coord position, bool blockedRow = false, bool blockedCol = false)
+public class Box(Coord position)
 {
     public Coord Position { get; set; } = position;
-    public bool BlockedRow { get; private set; } = blockedRow;
-    public bool BlockedCol { get; private set; } = blockedCol;
 
-    public bool IsBlocked(Direction dir, char[][] map, List<Box> boxes)
+    public bool IsBlocked(Coord move, Direction dir, char[,] map, List<Box> boxes)
     {
-        if (dir is Direction.Left or Direction.Right && BlockedRow
-          || dir is Direction.Up or Direction.Down && BlockedCol)
-            return true;
+        Box? nbBox = FindNeighbor(move, boxes, out Coord nbCoord);
 
-        if (Position.Neighbours.ElementAt((int)dir) is Box)
+        if (nbBox is null)
         {
+            if (map[nbCoord.Row, nbCoord.Col] is '#')
+            {
+                return true;
+            }
 
+            return false;
         }
 
+        return nbBox.IsBlocked(move, dir, map, boxes);
+    }
+
+    public void Move(Coord move, Direction dir, char[,] map, List<Box> boxes)
+    {
+        if (!IsBlocked(move, dir, map, boxes))
+        {
+            Box? nbBox = FindNeighbor(move, boxes, out Coord nbCoord);
+
+            if (nbBox is not null)
+            {
+                nbBox.Move(move, dir, map, boxes);
+
+                if (nbBox.Position == nbCoord)
+                {
+                    return;
+                }
+            }
+
+            Position = nbCoord;
+        }
+    }
+
+    private Box? FindNeighbor(Coord move, List<Box> boxes, out Coord nbCoord)
+    {
+        nbCoord = Position + move;
+        var target = nbCoord;
+        return boxes.Find(box => box.Position == target);
     }
 }

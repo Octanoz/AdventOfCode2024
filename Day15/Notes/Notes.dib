@@ -1,0 +1,57 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.Text;
+using System.IO;
+
+Dictionary<char, string> replacements = new()
+{
+    ['#'] = "##",
+    ['O'] = "[]",
+    ['.'] = "..",
+    ['@'] = "@."
+};
+
+int maxRow, maxCol;
+
+List<char[]> lines = [];
+using (StreamReader sr = new(@"Day15/example2.txt"))
+{
+    StringBuilder sb = new();
+    string line = sr.ReadLine();
+    while (!String.IsNullOrEmpty(line))
+    {
+        char[] letterArray = new char[line.Length * 2];
+        Queue<char> queue = [];
+        foreach (var letter in line)
+        {
+            queue.Enqueue(letter);
+        }
+
+        for (int i = 1; i < letterArray.Length; i += 2)
+        {
+            char currentLetter = queue.Dequeue();
+            if (replacements.TryGetValue(currentLetter, out string storedString))
+            {
+                letterArray[i - 1] = storedString[0];
+                letterArray[i] = storedString[1];
+            }
+            else
+            {
+                Console.WriteLine($"No replacement for {currentLetter} in replacements");
+                break;
+            }
+        }
+
+        lines.Add(letterArray);
+
+        line = sr.ReadLine();
+    }
+}
+
+char[][] map = lines.ToArray();
+
+map.Display();

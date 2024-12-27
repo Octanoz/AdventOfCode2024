@@ -44,18 +44,6 @@ public static class Span2DExtensions
         }
     }
 
-    public static void DrawGridSideways(this Span2D<char> grid)
-    {
-        for (int col = 0; col < grid.Width; col++) // Iterate over columns
-        {
-            foreach (var item in grid.GetColumn(col))
-            {
-                Console.Write(item);
-            }
-            Console.WriteLine(); // New line after each column (now row in sideways view)
-        }
-    }
-
     public static void DrawInt2D(this Span2D<int> grid)
     {
         for (int i = 0; i < grid.Height; i++)

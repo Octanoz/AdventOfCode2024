@@ -1,3 +1,6 @@
+using System.Text;
+using CommunityToolkit.HighPerformance;
+
 namespace AdventUtilities;
 
 public static class GridExtensions
@@ -114,7 +117,6 @@ public static class GridExtensions
         return grid;
     }
 
-
     private static Func<char, T> GetCharConvertFunc<T>()
     {
         return Type.GetTypeCode(typeof(T)) switch
@@ -185,6 +187,26 @@ public static class GridExtensions
             }
             Console.WriteLine();
         }
+    }
+
+    public static string Write2DGridTight<T>(this T[,] grid)
+    {
+        int rows = grid.GetLength(0);
+        int cols = grid.GetLength(1);
+
+        StringBuilder sb = new();
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                sb.Append($"{grid[i, j]}");
+            }
+
+            sb.AppendLine();
+        }
+
+        return sb.ToString();
     }
 
     public static void CompareToOther<T>(this T[,] first, T[,] second)
@@ -302,4 +324,6 @@ public static class GridExtensions
 
         return result;
     }
+
+    public static Span2D<T> ConvertToSpan2D<T>(this T[][] grid) => grid.ConvertJaggedTo2D().AsSpan2D();
 }
