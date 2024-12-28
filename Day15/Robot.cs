@@ -3,13 +3,14 @@ using CommunityToolkit.HighPerformance;
 
 namespace Day15;
 
-public class Robot(Coord position, char[,] map, List<Direction> moves, List<Box> boxes, List<WideBox> wideBoxes)
+public class Robot(Coord position, char[,] map, List<Direction> moves, List<Coord> walls, List<IMovable> boxes)
 {
     const char Wall = '#';
     private readonly char[,] map = map;
     private readonly List<Direction> moves = moves;
-    private readonly MapUpdater mapUpdater = new(boxes);
+    private MapUpdater mapUpdater = new(boxes, walls);
     private readonly int boxCount = boxes.Count;
+    private Coord lastPosition = position;
 
     private static readonly Dictionary<Direction, Coord> directionMap = new()
     {
@@ -23,7 +24,7 @@ public class Robot(Coord position, char[,] map, List<Direction> moves, List<Box>
 
     public bool IsBlocked(Coord move, Direction dir)
     {
-        Box? nbBox = FindNeighbor(move, boxes, out Coord target);
+        Box? nbBox = FindBoxNeighbour(move, boxes, out Coord target);
 
         if (map[target.Row, target.Col] is Wall)
             return true;
@@ -31,38 +32,46 @@ public class Robot(Coord position, char[,] map, List<Direction> moves, List<Box>
         return nbBox?.IsBlocked(move, dir, map, boxes) ?? false;
     }
 
-    public void Move(Coord move, Direction dir, List<Box> boxes)
+    public void Move(Coord move, Direction dir, List<IMovable> boxes)
     {
+        bool boxMoved = false;
         using StreamWriter swBlocked = new(Path.Combine(InputData.GetSolutionDirectory(), "Day15/Notes/output.txt"), true);
-        if (IsBlocked(move, dir))
-        {
-            swBlocked.WriteLine($"Unable to move this turn");
-            swBlocked.WriteLine(dir switch
-            {
-                Direction.Up => "\nMOVING UP\n--------\n",
-                Direction.Right => "\nMOVING RIGHT\n--------\n",
-                Direction.Down => "\nMOVING DOWN\n--------\n",
-                Direction.Left => "\vMOVING LEFT\n--------\n",
-                _ => throw new ArgumentException($"Unknown direction {dir} found.")
-            });
-
-            return;
-        }
 
         MonitorBoxes(dir);
 
-        Box? nbBox = FindNeighbor(move, boxes, out Coord target);
+        var mapSpan = map.AsSpan2D();
+        Box? nbBox = FindBoxNeighbour(move, boxes, out Coord target);
+        if (mapSpan.GetValueAt(target) is Wall)
+            return;
 
         if (nbBox is not null)
         {
             nbBox.Move(move, dir, map, boxes);
             if (nbBox.Position == target)
+            {
+                swBlocked.WriteLine($"Unable to move this turn");
+                swBlocked.WriteLine(dir switch
+                {
+                    Direction.Up => "\nMOVING UP\n--------\n",
+                    Direction.Right => "\nMOVING RIGHT\n--------\n",
+                    Direction.Down => "\nMOVING DOWN\n--------\n",
+                    Direction.Left => "\vMOVING LEFT\n--------\n",
+                    _ => throw new ArgumentException($"Unknown direction {dir} found.")
+                });
+
                 return;
+            }
+
+            boxMoved = true;
         }
 
-        var mapSpan = map.AsSpan2D();
+        lastPosition = Position;
+        Position = target;
 
-        if (dir is Direction.Left or Direction.Right)
+        mapUpdater.UpdateBoxesMap(mapSpan, lastPosition, Position, dir, boxMoved);
+
+        mapSpan.Draw2DGridTight();
+        /* if (dir is Direction.Left or Direction.Right)
         {
             var rowSpan = dir is Direction.Right
                         ? mapSpan.GetRowSpan(Position.Row)[Position.Col..]
@@ -70,18 +79,18 @@ public class Robot(Coord position, char[,] map, List<Direction> moves, List<Box>
 
             if (dir is Direction.Right)
             {
-                mapUpdater.UpdateMapRight(rowSpan, Position);
+                mapUpdater.UpdateMapRight(rowSpan, lastPosition);
             }
-            else mapUpdater.UpdateMapLeft(rowSpan, Position);
+            else mapUpdater.UpdateMapLeft(rowSpan, lastPosition);
         }
         else if (dir is Direction.Up)
         {
-            mapUpdater.UpdateMapUp(mapSpan, Position);
+            mapUpdater.UpdateMapUp(mapSpan, lastPosition);
         }
-        else mapUpdater.UpdateMapDown(mapSpan, Position);
+        else mapUpdater.UpdateMapDown(mapSpan, lastPosition);
 
 
-        Position = target;
+        Position = target; */
     }
 
     private void MonitorBoxes(Direction dir)
@@ -98,7 +107,7 @@ public class Robot(Coord position, char[,] map, List<Direction> moves, List<Box>
                     break;
                 case var bc when bc < boxCount:
                     sw.WriteLine($"Found {boxesCounted} boxes in the map. Scanning the boxes list for missing elements.");
-                    foreach (var box in boxes)
+                    foreach (var box in boxes.OfType<Box>())
                     {
                         if (map[box.Position.Row, box.Position.Col] == '.')
                         {
@@ -113,7 +122,7 @@ public class Robot(Coord position, char[,] map, List<Direction> moves, List<Box>
                     {
                         for (int j = 0; j < map.GetLength(1); j++)
                         {
-                            if (map[i, j] == 'O' && !boxes.Exists(box => box.Position.Row == i && box.Position.Col == j))
+                            if (map[i, j] == 'O' && !boxes.Exists(box => box.Occupies(new(i, j))))
                             {
                                 sw.WriteLine($"Found extra box at ({i}, {j})");
                                 map[i, j] = '.';
@@ -143,14 +152,21 @@ public class Robot(Coord position, char[,] map, List<Direction> moves, List<Box>
         });
     }
 
-    private Box? FindNeighbor(Coord move, List<Box> boxes, out Coord neighborCoord)
+    private Box? FindBoxNeighbour(Coord move, List<IMovable> boxes, out Coord neighbourCoord)
     {
-        neighborCoord = Position + move;
-        var target = neighborCoord;
-        return boxes.Find(box => box.Position == target);
+        neighbourCoord = Position + move;
+        var target = neighbourCoord;
+        return (Box?)boxes.Find(box => box.Occupies(target));
     }
 
-    public (List<Box>, char[][]) ProcessMoves()
+    private WideBox? FindWideBoxNeighbour(Coord move, List<IMovable> boxes, out Coord neighbourCoord)
+    {
+        neighbourCoord = Position + move;
+        var target = neighbourCoord;
+        return (WideBox?)boxes.Find(box => box.Occupies(target));
+    }
+
+    public (List<IMovable>, char[][]) ProcessMoves()
     {
         foreach (var direction in moves)
         {

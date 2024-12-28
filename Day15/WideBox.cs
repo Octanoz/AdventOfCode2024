@@ -2,13 +2,13 @@ using AdventUtilities;
 
 namespace Day15;
 
-public class WideBox(Coord leftWing)
+public class WideBox(Coord leftWing) : IMovable
 {
     private Coord lastPosition = leftWing;
     public Coord LeftWing { get; private set; } = leftWing;
     public Coord RightWing => new(LeftWing.Row, LeftWing.Col + 1);
 
-    public void Move(Coord move, Direction dir, char[,] map, List<WideBox> boxes)
+    public void Move(Coord move, Direction dir, char[,] map, List<IMovable> boxes)
     {
         if (dir is Direction.Up or Direction.Down)
         {
@@ -24,15 +24,15 @@ public class WideBox(Coord leftWing)
                     return;
 
                 case ('[', ']'):
-                    WideBox singleNeighbour = boxes.Find(box => box.Occupies(leftMove))!;
+                    WideBox singleNeighbour = (WideBox)boxes.Find(box => box.Occupies(leftMove))!;
                     singleNeighbour.Move(move, dir, map, boxes);
                     if (singleNeighbour.Occupies(leftMove))
                         return;
                     break;
 
                 case (']', '['):
-                    WideBox firstNeighbour = boxes.Find(box => box.Occupies(leftMove))!;
-                    WideBox secondNeighbour = boxes.Find(box => box.Occupies(rightMove))!;
+                    WideBox firstNeighbour = (WideBox)boxes.Find(box => box.Occupies(leftMove))!;
+                    WideBox secondNeighbour = (WideBox)boxes.Find(box => box.Occupies(rightMove))!;
 
                     firstNeighbour.Move(move, dir, map, boxes);
                     if (firstNeighbour.Occupies(leftMove))
@@ -47,14 +47,14 @@ public class WideBox(Coord leftWing)
                     break;
 
                 case (']', _):
-                    WideBox leftNeighbour = boxes.Find(box => box.Occupies(leftMove))!;
+                    WideBox leftNeighbour = (WideBox)boxes.Find(box => box.Occupies(leftMove))!;
                     leftNeighbour.Move(move, dir, map, boxes);
                     if (leftNeighbour.Occupies(leftMove))
                         return;
                     break;
 
                 case (_, '['):
-                    WideBox rightNeighbour = boxes.Find(box => box.Occupies(rightMove))!;
+                    WideBox rightNeighbour = (WideBox)boxes.Find(box => box.Occupies(rightMove))!;
                     rightNeighbour.Move(move, dir, map, boxes);
                     if (rightNeighbour.Occupies(rightMove))
                         return;
@@ -81,15 +81,20 @@ public class WideBox(Coord leftWing)
         LeftWing += move;
     }
 
-    private WideBox? FindRowNeighbour(Coord move, List<WideBox> boxes, out Coord nbCoord)
+    private WideBox? FindRowNeighbour(Coord move, List<IMovable> boxes, out Coord nbCoord)
     {
         nbCoord = move.Col is 1 ? RightWing + move : LeftWing + move;
         var target = nbCoord;
 
-        return boxes.Find(box => box.Occupies(target));
+        return (WideBox?)boxes.Find(box => box.Occupies(target));
     }
 
     public void Reset() => LeftWing = lastPosition;
 
     public bool Occupies(Coord coord) => coord == LeftWing || coord == RightWing;
+    public bool OccupiesAny(IEnumerable<Coord> targetCoords) => targetCoords.Any(Occupies);
+    public bool OccupiesAnyColInRowBefore(int row, int targetCol) => LeftWing.Row == row && LeftWing.Col < targetCol;
+    public bool OccupiesAnyColInRowAfter(int row, int targetCol) => RightWing.Row == row && RightWing.Col > targetCol;
+    public bool OccupiesAnyRowInColBefore(int col, int targetRow) => LeftWing.Col == col && LeftWing.Row < targetRow || RightWing.Col == col && RightWing.Row < targetRow;
+    public bool OccupiesAnyRowInColAfter(int col, int targetRow) => LeftWing.Col == col && LeftWing.Row > targetRow || RightWing.Col == col && RightWing.Row > targetRow;
 }

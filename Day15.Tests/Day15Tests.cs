@@ -35,11 +35,12 @@ public class Day15Tests
     }
 
     [Fact]
-    public void UpdateMap_MovingRight_ShouldUpdateRoSpanCorrectly()
+    public void UpdateMap_PartOne_MovingRight_ShouldUpdateRoSpanCorrectly()
     {
         //Arrange
-        List<Box> boxes = [new(new(2, 4)), new(new(2, 5))];
-        MapUpdater mapUpdater = new(boxes);
+        List<IMovable> boxes = [new Box(new(2, 3)), new Box(new(2, 4))];
+        MapUpdater mapUpdater = new(boxes, []);
+        bool boxesMoved = true;
         char[,] map =
         {
             { '.', '.', '.', '.', '.', '.' },
@@ -50,19 +51,20 @@ public class Day15Tests
         };
 
         //Act
-        Span<char> row = map.AsSpan2D().GetRowSpan(2)[1..];
-        Coord robot = new(2, 2);
-        mapUpdater.UpdateMapRight(row, robot);
+        Coord robot = new(2, 1);
+        Coord target = new(2, 2);
+        mapUpdater.UpdateBoxesMap(map.AsSpan2D(), robot, target, Direction.Right, boxesMoved);
 
         //Assert
         Assert.Equal(['.', '.', '@', 'O', 'O', '.'], map.AsSpan2D().GetRowSpan(2));
     }
 
     [Fact]
-    public void UpdateMap_MovingRight_PushingBoxes_ShouldUpdateRoSpanCorrectly()
+    public void UpdateMap_PartOne_MovingRight_PushingBoxes_ShouldUpdateRoSpanCorrectly()
     {
         //Arrange
-        List<Box> boxes = [new(new(2, 3)), new(new(2, 4))];
+        List<IMovable> boxes = [new Box(new(2, 3)), new Box(new(2, 4))];
+        MapUpdater mapUpdater = new(boxes, []);
         char[,] map =
         {
             { '.', '.', '.', '.', '.', '.' },
@@ -71,7 +73,7 @@ public class Day15Tests
             { '.', '.', '.', '.', '.', '.' },
             { '.', '.', '.', '.', '.', '.' }
         };
-        Robot robot = new(new(2, 2), map, [Direction.Right], boxes, []);
+        Robot robot = new(new(2, 2), map, [Direction.Right], [], boxes);
 
         //Act
         Coord move = Coord.Zero.Right;
@@ -82,22 +84,25 @@ public class Day15Tests
     }
 
     [Fact]
-    public void UpdateMapUp_MovingUp_ShouldUpdateColumnCorrectly()
+    public void UpdateMap_PartOne_MovingUp_ShouldUpdateColumnCorrectly()
     {
         //Arrange
-        List<Box> boxes = [new(new(0, 2)), new(new(3, 2))];
-        MapUpdater mapUpdater = new(boxes);
+        List<IMovable> boxes = [new Box(new(0, 2)), new Box(new(3, 2))];
+        MapUpdater mapUpdater = new(boxes, []);
+        bool boxesMoved = true;
         char[,] map =
         {
             { '.', '.', '.', '.' },
             { '.', '.', '.', '.' },
-            { '.', '@', '.', '.' },
+            { '.', '.', '@', '.' },
             { '.', '.', '.', '.' },
             { '.', '.', '.', '.' }
         };
 
         //Act
-        mapUpdater.UpdateMapUp(map.AsSpan2D(), new(2, 2));
+        Coord robot = new(2, 2);
+        Coord target = new(1, 2);
+        mapUpdater.UpdateBoxesMap(map.AsSpan2D(), robot, target, Direction.Up, boxesMoved);
 
         //Assert
         Assert.Equal('.', map[2, 2]);
@@ -106,11 +111,12 @@ public class Day15Tests
     }
 
     [Fact]
-    public void UpdateMapUp_MovingUpWhilePushing_ShouldUpdateColumnCorrectly()
+    public void UpdateMap_PartOne_MovingUpWhilePushing_ShouldUpdateColumnCorrectly()
     {
         //Arrange
-        List<Box> boxes = [new(new(2, 1)), new(new(4, 1))];
-        MapUpdater mapUpdater = new(boxes);
+        List<IMovable> boxes = [new Box(new(2, 1)), new Box(new(4, 1))];
+        MapUpdater mapUpdater = new(boxes, []);
+        bool boxesMoved = true;
         char[,] map =
         {
             { '.', '.', '.', '.' },
@@ -119,12 +125,14 @@ public class Day15Tests
             { '.', '@', '.', '.' },
             { '.', '.', '.', '.' }
         };
-        Robot robot = new(new(3, 1), map, [Direction.Up], boxes, []);
+        Coord previous = new(3, 1);
+        Robot robot = new(previous, map, [Direction.Up], [], boxes);
 
         //Act
         Coord move = Coord.Zero.Up;
+        Coord current = previous + move;
         robot.Move(move, Direction.Up, boxes);
-        mapUpdater.UpdateMapUp(map.AsSpan2D(), robot.Position);
+        mapUpdater.UpdateBoxesMap(map.AsSpan2D(), previous, current, Direction.Up, boxesMoved);
 
         //Assert
         Assert.Equal('.', map[0, 1]);
@@ -133,11 +141,12 @@ public class Day15Tests
     }
 
     [Fact]
-    public void UpdateMapDown_MovingDown_ShouldUpdateColumnCorrectly()
+    public void UpdateMap_PartOne_MovingDown_ShouldUpdateColumnCorrectly()
     {
         //Arrange
-        List<Box> boxes = [new(new(1, 1)), new(new(4, 1))];
-        MapUpdater mapUpdater = new(boxes);
+        List<IMovable> boxes = [new Box(new(1, 1)), new Box(new(4, 1))];
+        MapUpdater mapUpdater = new(boxes, []);
+        bool boxesMoved = true;
         char[,] map =
         {
             { '.', '.', '.', '.' },
@@ -146,9 +155,11 @@ public class Day15Tests
             { '.', '.', '.', '.' },
             { '.', '.', '.', '.' }
         };
+        Coord previous = new(2, 1);
 
         //Act
-        mapUpdater.UpdateMapDown(map.AsSpan2D(), new(2, 1));
+        Coord current = new(3, 1);
+        mapUpdater.UpdateBoxesMap(map.AsSpan2D(), previous, current, Direction.Down, boxesMoved);
 
         //Assert
         Assert.Equal('.', map[2, 1]);
@@ -157,11 +168,12 @@ public class Day15Tests
     }
 
     [Fact]
-    public void UpdateMap_MovingLeftOnEmptyRow_ShouldOnlyUpdateRobotPosition()
+    public void UpdateMap_PartOne_MovingLeftOnEmptyRow_ShouldOnlyUpdateRobotPosition()
     {
         //Arrange
-        List<Box> boxes = [];
-        MapUpdater mapUpdater = new(boxes);
+        List<IMovable> boxes = [];
+        MapUpdater mapUpdater = new(boxes, []);
+        bool boxesMoved = false;
         char[,] map =
         {
             { '.', '.', '.', '.', '.', '.' },
@@ -170,20 +182,22 @@ public class Day15Tests
             { '.', '.', '.', '.', '.', '.' },
             { '.', '.', '.', '.', '.', '.' }
         };
+        Coord previous = new(2, 4);
 
-        Span<char> rowSpan = map.AsSpan2D().GetRowSpan(2)[..5];
-        Coord robotPosition = new(2, 4);
+        //Act
+        Coord current = new(2, 3);
+        mapUpdater.UpdateBoxesMap(map.AsSpan2D(), previous, current, Direction.Left, boxesMoved);
+        var rowSpan = map.AsSpan2D().GetRowSpan(2);
 
-        mapUpdater.UpdateMapLeft(rowSpan, robotPosition);
-
-        Assert.Equal(['.', '.', '.', '@', '.'], rowSpan);
+        Assert.Equal(['.', '.', '.', '@', '.', '.'], rowSpan);
     }
 
     [Fact]
-    public void UpdateMap_MovingLeftAndPushingBoxes_ShouldOnlyUpdateRobotPosition()
+    public void UpdateMap_PartOne_MovingLeftAndPushingBoxes_ShouldOnlyUpdateRobotPosition()
     {
-        List<Box> boxes = [new(new(2, 3)), new(new(2, 2))];
-        MapUpdater mapUpdater = new(boxes);
+        //Arrange
+        List<IMovable> boxes = [new Box(new(2, 3)), new Box(new(2, 2))];
+        MapUpdater mapUpdater = new(boxes, []);
 
         char[,] map =
         {
@@ -194,14 +208,13 @@ public class Day15Tests
             { '.', '.', '.', '.', '.', '.' }
         };
 
-        Robot robot = new(new(2, 4), map, [Direction.Left], boxes, []);
+        Robot robot = new(new(2, 4), map, [Direction.Left], [], boxes);
         Coord move = Coord.Zero.Left;
         robot.Move(move, Direction.Left, boxes);
 
         Span<char> rowSpan = map.AsSpan2D().GetRowSpan(2)[..5];
-        Coord robotPosition = new(2, 4);
 
-        mapUpdater.UpdateMapLeft(rowSpan, robotPosition);
+        // mapUpdater.UpdateBoxesMap(rowSpan, robotPosition);
 
         Assert.Equal(['.', 'O', 'O', '@', '.'], rowSpan);
     }

@@ -7,12 +7,20 @@ public static class Solver
     public static int PartOne(string filePath)
     {
         var (map, moves) = ProcessMap(filePath);
-        List<Box> boxes = map.Index()
-                             .SelectMany(row => row.Item.Index()
-                                                        .Select(col => col)
-                                                        .Where(col => col.Item == 'O')
-                                                        .Select(col => new Box(new Coord(row.Index, col.Index))))
-                             .ToList();
+        List<IMovable> boxes = map.Index()
+                                  .SelectMany(row => row.Item.Index()
+                                                             .Select(col => col)
+                                                             .Where(col => col.Item == 'O')
+                                                             .Select(col => new Box(new Coord(row.Index, col.Index))))
+                                  .Cast<IMovable>()
+                                  .ToList();
+
+        List<Coord> walls = map.Index()
+                               .SelectMany(row => row.Item.Index()
+                                                          .Select(col => col)
+                                                          .Where(col => col.Item == '#')
+                                                          .Select(col => new Coord(row.Index, col.Index)))
+                               .ToList();
 
         Coord robotCoord = map.Index()
                               .SelectMany(row => row.Item.Index()
@@ -21,7 +29,7 @@ public static class Solver
                                                          .Select(col => new Coord(row.Index, col.Index)))
                               .First();
 
-        Robot robot = new(robotCoord, map.ConvertJaggedTo2D(), moves, boxes, []);
+        Robot robot = new(robotCoord, map.ConvertJaggedTo2D(), moves, walls, boxes);
 
         (boxes, map) = robot.ProcessMoves();
 
@@ -34,7 +42,7 @@ public static class Solver
                 index = Array.IndexOf(map[i], 'O');
             }
 
-            foreach (var box in boxes.Where(box => box.Position.Row == i))
+            foreach (Box box in boxes.Where(box => box.OccupiesAnyColInRowAfter(i, 0)))
             {
                 map[i][box.Position.Col] = 'O';
             }
@@ -44,7 +52,7 @@ public static class Solver
 
         map.DrawJaggedGridTight();
 
-        return boxes.Sum(box => box.Position.Row * 100 + box.Position.Col);
+        return boxes.OfType<Box>().Sum(box => box.Position.Row * 100 + box.Position.Col);
 
     }
 

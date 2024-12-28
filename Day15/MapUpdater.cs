@@ -3,15 +3,91 @@ using CommunityToolkit.HighPerformance;
 
 namespace Day15;
 
-public class MapUpdater(List<Box> boxes)
+public class MapUpdater(List<IMovable> boxes, List<Coord> walls)
 {
-    private readonly List<Box> boxes = boxes;
+    public void UpdateBoxesMap(Span2D<char> mapSpan, Coord previous, Coord current, Direction dir, bool boxMoved)
+    {
+        if (!boxMoved)
+        {
+            mapSpan[previous.Row, previous.Col] = '.';
+            mapSpan[current.Row, current.Col] = '@';
 
-    public void UpdateMapLeft(Span<char> rowSpan, Coord robotPosition)
+            return;
+        }
+
+        switch (dir)
+        {
+            case Direction.Up:
+                mapSpan.WipeCharBeforeRow(previous, 1);
+                foreach (Box box in boxes.Where(box => box.OccupiesAnyRowInColBefore(current.Col, current.Row)))
+                {
+                    mapSpan.SetCharAt('O', box.Position);
+                }
+
+                RestoreWallsCol(mapSpan, current.Col);
+                break;
+
+            case Direction.Right:
+                mapSpan.WipeCharAfterCol(previous, 1);
+                foreach (Box box in boxes.Where(box => box.OccupiesAnyColInRowAfter(current.Row, current.Col)))
+                {
+                    mapSpan.SetCharAt('O', box.Position);
+                }
+
+                RestoreWallsRow(mapSpan, current.Row);
+                break;
+
+            case Direction.Down:
+                mapSpan.WipeCharAfterRow(previous, 1);
+                foreach (Box box in boxes.Where(box => box.OccupiesAnyRowInColAfter(current.Col, current.Row)))
+                {
+                    mapSpan.SetCharAt('O', box.Position);
+                }
+
+                RestoreWallsCol(mapSpan, current.Col);
+                break;
+
+            case Direction.Left:
+                mapSpan.WipeCharBeforeCol(previous, 1);
+                foreach (Box box in boxes.Where(box => box.OccupiesAnyColInRowBefore(current.Row, current.Col)))
+                {
+                    mapSpan.SetCharAt('O', box.Position);
+                }
+
+                RestoreWallsRow(mapSpan, current.Row);
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(dir));
+        }
+
+        mapSpan.SetCharAt('.', previous);
+        mapSpan.SetCharAt('@', current);
+    }
+
+    private void RestoreWallsCol(Span2D<char> mapSpan, int col)
+    {
+        foreach (var wall in walls.Where(w => w.Col == col))
+        {
+            mapSpan.SetCharAt('#', wall);
+        }
+    }
+
+    private void RestoreWallsRow(Span2D<char> mapSpan, int row)
+    {
+        foreach (var wall in walls.Where(w => w.Row == row))
+        {
+            mapSpan.SetCharAt('#', wall);
+        }
+    }
+
+    public int GetBoxCount() => boxes.Count;
+
+    /*public void UpdateMapLeft(Span<char> rowSpan, Coord robotPosition)
     {
         HashSet<Coord> processedPositions = [];
 
-        foreach (var box in boxes.Where(box => box.Position.Row == robotPosition.Row && box.Position.Col < robotPosition.Col))
+        foreach (var box in boxes.OfType<Box>().Where(box => box.OccupiesAnyColInRowBefore(robotPosition.Row, robotPosition.Col)))
         {
             rowSpan[box.Position.Col] = 'O';
             processedPositions.Add(box.Position);
@@ -107,6 +183,6 @@ public class MapUpdater(List<Box> boxes)
 
         mapSpan[robotPosition.Row, robotPosition.Col] = '.';
         mapSpan[robotPosition.Row + 1, robotPosition.Col] = '@';
-    }
+    }*/
 
 }

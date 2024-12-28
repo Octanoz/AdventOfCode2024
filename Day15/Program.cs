@@ -9,6 +9,6 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day15/input.txt")
 };
 
-int result = Solver.PartOne(filePaths["challenge"]);
+int result = Solver.PartOne(filePaths["example1"]);
 Console.WriteLine(result);
 
