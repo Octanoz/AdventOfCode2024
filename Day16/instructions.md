@@ -149,8 +149,3 @@ In the second example, there are `64` tiles that are part of at least one of the
 ## Challenge 2
 
 Analyze your map further. How many tiles are part of at least one of the best paths through the maze?
-
-| Tried | Result |
-|-------|--------|
-| 603 | Too low |
-| 610 | Too low |

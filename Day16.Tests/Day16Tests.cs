@@ -87,8 +87,4 @@ public class Day16Tests
         //Assert
         Assert.Equal(622, result);
     }
-
-
-
-
 }
