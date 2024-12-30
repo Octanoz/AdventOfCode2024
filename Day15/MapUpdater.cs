@@ -1,10 +1,13 @@
+using System.Collections.Frozen;
 using AdventUtilities;
 using CommunityToolkit.HighPerformance;
+using System.Linq;
 
 namespace Day15;
 
-public class MapUpdater(List<IMovable> boxes, List<Coord> walls)
+public class MapUpdater(List<Box> boxes)
 {
+    private static HashSet<Coord> wallCache = [];
     public void UpdateBoxesMap(Span2D<char> mapSpan, Coord previous, Coord current, Direction dir, bool boxMoved)
     {
         if (!boxMoved)
@@ -18,171 +21,114 @@ public class MapUpdater(List<IMovable> boxes, List<Coord> walls)
         switch (dir)
         {
             case Direction.Up:
-                mapSpan.WipeCharBeforeRow(previous, 1);
-                foreach (Box box in boxes.Where(box => box.OccupiesAnyRowInColBefore(current.Col, current.Row)))
-                {
-                    mapSpan.SetCharAt('O', box.Position);
-                }
+                if (wallCache.Contains(current.Up))
+                    break;
 
-                RestoreWallsCol(mapSpan, current.Col);
+                WipeColBeforeCoordRow(mapSpan, current);
                 break;
 
             case Direction.Right:
-                mapSpan.WipeCharAfterCol(previous, 1);
-                foreach (Box box in boxes.Where(box => box.OccupiesAnyColInRowAfter(current.Row, current.Col)))
-                {
-                    mapSpan.SetCharAt('O', box.Position);
-                }
+                if (wallCache.Contains(current.Right))
+                    break;
 
-                RestoreWallsRow(mapSpan, current.Row);
+                WipeRowAfterCoordCol(mapSpan, current);
                 break;
 
             case Direction.Down:
-                mapSpan.WipeCharAfterRow(previous, 1);
-                foreach (Box box in boxes.Where(box => box.OccupiesAnyRowInColAfter(current.Col, current.Row)))
-                {
-                    mapSpan.SetCharAt('O', box.Position);
-                }
+                if (wallCache.Contains(current.Down))
+                    break;
 
-                RestoreWallsCol(mapSpan, current.Col);
+                WipeColAfterCoordRow(mapSpan, current);
                 break;
 
             case Direction.Left:
-                mapSpan.WipeCharBeforeCol(previous, 1);
-                foreach (Box box in boxes.Where(box => box.OccupiesAnyColInRowBefore(current.Row, current.Col)))
-                {
-                    mapSpan.SetCharAt('O', box.Position);
-                }
+                if (wallCache.Contains(current.Left))
+                    break;
 
-                RestoreWallsRow(mapSpan, current.Row);
+                WipeRowBeforeCoordCol(mapSpan, current);
                 break;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(dir));
         }
 
+        foreach (Box box in boxes.Where(box => box.Moved))
+        {
+            mapSpan.SetCharAt('O', box.Position);
+            box.ResetMovedState();
+        }
+
         mapSpan.SetCharAt('.', previous);
         mapSpan.SetCharAt('@', current);
     }
 
-    private void RestoreWallsCol(Span2D<char> mapSpan, int col)
+    private static void WipeColBeforeCoordRow(Span2D<char> mapSpan, Coord coord)
     {
-        foreach (var wall in walls.Where(w => w.Col == col))
+        var wallCoords = mapSpan.StoreWallCoordsInCol(coord.Col);
+        if (!wallCache.Contains(wallCoords.Skip(1).First()))
         {
-            mapSpan.SetCharAt('#', wall);
+            wallCache.UnionWith(wallCoords);
         }
+        var lastWall = wallCoords.Where(wall => wall.Row < coord.Row).DefaultIfEmpty(Coord.Zero with { Col = coord.Col }).MaxBy(wall => wall.Row)!.Row;
+        if (lastWall == coord.Up.Row)
+            return;
+
+        var mapSlice = mapSpan.Slice(lastWall + 1, coord.Col, coord.Row - (lastWall + 1), 1);
+        mapSlice.Fill('.');
     }
 
-    private void RestoreWallsRow(Span2D<char> mapSpan, int row)
+    private static void WipeColAfterCoordRow(Span2D<char> mapSpan, Coord coord)
     {
-        foreach (var wall in walls.Where(w => w.Row == row))
+        var wallCoords = mapSpan.StoreWallCoordsInCol(coord.Col);
+        if (!wallCache.Contains(wallCoords.Skip(1).First()))
         {
-            mapSpan.SetCharAt('#', wall);
+            wallCache.UnionWith(wallCoords);
+        }
+
+        var firstWall = wallCoords.Where(wall => wall.Row > coord.Row).DefaultIfEmpty(coord with { Row = mapSpan.Height - 1 }).MinBy(wall => wall.Row)!.Row;
+        if (firstWall == coord.Down.Row)
+            return;
+
+        var mapSlice = mapSpan.Slice(coord.Row, coord.Col, firstWall - 1 - coord.Row, 1);
+        mapSlice.Fill('.');
+    }
+
+    private static void WipeRowBeforeCoordCol(Span2D<char> mapSpan, Coord coord)
+    {
+        var rowSpan = mapSpan.GetRowSpan(coord.Row)[..coord.Col];
+        int index = rowSpan.LastIndexOf('#');
+        if (index == coord.Left.Col)
+        {
+            wallCache.Add(coord.Left);
+            return;
+        }
+
+        rowSpan = rowSpan[(index + 1)..];
+        rowSpan.Fill('.');
+    }
+
+    private static void WipeRowAfterCoordCol(Span2D<char> mapSpan, Coord coord)
+    {
+        var rowSpan = mapSpan.GetRowSpan(coord.Row)[(coord.Col + 1)..];
+        int index = rowSpan.IndexOf('#');
+        if (index == coord.Right.Col)
+        {
+            wallCache.Add(coord.Right);
+            return;
+        }
+
+        rowSpan = rowSpan[..index];
+        rowSpan.Fill('.');
+    }
+
+    public void RestoreMovedBoxes(Span2D<char> mapSpan)
+    {
+        foreach (Box box in boxes.Where(box => box.Moved))
+        {
+            mapSpan.SetCharAt('O', box.Position);
+            box.ResetMovedState();
         }
     }
 
     public int GetBoxCount() => boxes.Count;
-
-    /*public void UpdateMapLeft(Span<char> rowSpan, Coord robotPosition)
-    {
-        HashSet<Coord> processedPositions = [];
-
-        foreach (var box in boxes.OfType<Box>().Where(box => box.OccupiesAnyColInRowBefore(robotPosition.Row, robotPosition.Col)))
-        {
-            rowSpan[box.Position.Col] = 'O';
-            processedPositions.Add(box.Position);
-        }
-
-        for (int i = 0; i < rowSpan.Length; i++)
-        {
-            Coord current = robotPosition with { Col = i };
-            if (rowSpan[current.Col] is 'O' && !processedPositions.Contains(current))
-            {
-                rowSpan[current.Col] = '.';
-            }
-        }
-
-        rowSpan[^1] = '.';
-        rowSpan[^2] = '@';
-    }
-
-    public void UpdateMapRight(Span<char> rowSpan, Coord robotPosition)
-    {
-        HashSet<Coord> processedPositions = [];
-        int offset = robotPosition.Col;
-
-        foreach (var box in boxes.Where(box => box.Position.Row == robotPosition.Row && box.Position.Col > robotPosition.Col))
-        {
-            rowSpan[box.Position.Col - offset] = 'O';
-            processedPositions.Add(box.Position);
-        }
-
-        for (int i = 1; i < rowSpan.Length; i++)
-        {
-            Coord current = robotPosition with { Col = i };
-            Coord actual = robotPosition with { Col = i + offset };
-            if (rowSpan[current.Col] is 'O' && !processedPositions.Contains(actual))
-            {
-                rowSpan[current.Col] = '.';
-            }
-
-        }
-
-        rowSpan[0] = '.';
-        rowSpan[1] = '@';
-    }
-
-    public void UpdateMapUp(Span2D<char> mapSpan, Coord robotPosition)
-    {
-        HashSet<Coord> processedPositions = [];
-        Span<char> column = stackalloc char[mapSpan.Height];
-        mapSpan.GetColumn(robotPosition.Col).CopyTo(column);
-
-        foreach (var box in boxes.Where(box => box.Position.Col == robotPosition.Col
-                                            && box.Position.Row < robotPosition.Row))
-        {
-            mapSpan[box.Position.Row, box.Position.Col] = 'O';
-            processedPositions.Add(box.Position);
-        }
-
-        for (int i = 1; i < robotPosition.Row; i++)
-        {
-            Coord current = robotPosition with { Row = i };
-            if (mapSpan[i, robotPosition.Col] == 'O' && !processedPositions.Contains(current))
-            {
-                mapSpan[i, robotPosition.Col] = '.';
-            }
-        }
-
-        mapSpan[robotPosition.Row, robotPosition.Col] = '.';
-        mapSpan[robotPosition.Row - 1, robotPosition.Col] = '@';
-    }
-
-    public void UpdateMapDown(Span2D<char> mapSpan, Coord robotPosition)
-    {
-        int offset = robotPosition.Row;
-        HashSet<Coord> processedPositions = [];
-        Span<char> column = stackalloc char[mapSpan.Height];
-        mapSpan.GetColumn(robotPosition.Col).CopyTo(column);
-
-        foreach (var box in boxes.Where(box => box.Position.Col == robotPosition.Col
-                                            && box.Position.Row > robotPosition.Row))
-        {
-            mapSpan[box.Position.Row, box.Position.Col] = 'O';
-            processedPositions.Add(box.Position);
-        }
-
-        for (int i = offset + 1; i < column.Length; i++)
-        {
-            Coord current = robotPosition with { Row = i };
-            if (mapSpan[i, robotPosition.Col] == 'O' && !processedPositions.Contains(current))
-            {
-                mapSpan[i, robotPosition.Col] = '.';
-            }
-        }
-
-        mapSpan[robotPosition.Row, robotPosition.Col] = '.';
-        mapSpan[robotPosition.Row + 1, robotPosition.Col] = '@';
-    }*/
-
 }
