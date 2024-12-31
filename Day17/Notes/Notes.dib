@@ -28,3 +28,8 @@ string someInput = "123,abc,456,def,789";
 var numbers = input.Split(',').Where(elem => Char.IsDigit(elem[0])).Select(int.Parse).ToList();
 
 numbers.ForEach(Console.WriteLine);
+
+#!csharp
+
+int sumNum = 8;
+Console.WriteLine((char)(sumNum + '0'));

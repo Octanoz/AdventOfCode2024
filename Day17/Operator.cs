@@ -1,4 +1,5 @@
 using AdventUtilities;
+
 using SuperLinq;
 
 namespace Day17;
@@ -44,7 +45,7 @@ public static class Operator
             }
         }
 
-        long[] registers = [0, 0, 0];
+        int[] registers = [0, 0, 0];
 
         (int, int)[] operations = goal.Split(',')
                                       .Select(int.Parse)
@@ -56,65 +57,37 @@ public static class Operator
 
         filePath = Path.Combine(InputData.GetSolutionDirectory(), "Day17/Notes/output.txt");
 
-        long result = SearchInput(filePath, goal, registers, operations);
-
-        return result;
-    }
-
-    private static long SearchInput(string filePath, string goal, long[] registers, (int, int)[] operations)
-    {
-        long left = 0, right = long.MaxValue;
-        long goalNum = long.Parse(goal);
-        int length = goal.Length;
-
         string output = "";
-
-        while (left <= right)
+        int length = goal.Length;
+        int regA = int.MaxValue / 2;
+        // for (int iteration = 0; iteration < 256; iteration++)
+        while (output != goal)
         {
-            long mid = left + (right - left) / 2;
-            output = BuildComputerAndRun(mid, registers, operations);
+            // regA = output.Length > length ? (long)(regA * 1.1) : (long)(regA * 0.9);
+            // registers[0] = regA;
 
-            File.AppendAllText(filePath, $"G:{goal}\tO:{output}\tR:{mid}\n");
+            ThreeBit computer = new(registers, operations);
 
-            if (output.Length == length)
-            {
-                long outputNum = long.Parse(output);
-                if (outputNum == goalNum)
-                {
-                    return mid;
-                }
+            output = computer.Run(true);
+            // if (output.Length != length)
+            // {
+            //     continue;
+            // }
 
-                if (outputNum < goalNum)
-                {
-                    left = mid + 1;
-                }
-                else
-                {
-                    right = mid;
-                }
-            }
-
-            if (output.Length < length)
-            {
-                left = mid + 1;
-            }
-            else
-            {
-                right = mid - 1;
-            }
+            File.AppendAllText(filePath, $"G:{goal}\tO:{output}\tR:{regA}\nbinaryO: {ToBinary(output)}\nbinaryR: {ToBinary(regA)}\n");
         }
 
-        return -1;
-    }
-
-    private static string BuildComputerAndRun(long mid, long[] registers, (int, int)[] operations)
-    {
-        registers[0] = mid;
-        ThreeBit computer = new(registers, operations);
-
-        return computer.Run(true);
+        return regA;
     }
 
     private static int DigitCount(long num) => (int)Math.Floor(Math.Log10(num) + 1);
+
+    private static string ToBinary(string numString)
+    {
+        long num = long.Parse(numString);
+        return Convert.ToString(num, 2);
+    }
+
+    private static string ToBinary(long num) => Convert.ToString(num, 2);
 
 }

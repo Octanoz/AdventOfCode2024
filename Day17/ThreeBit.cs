@@ -1,21 +1,21 @@
 namespace Day17;
 
-public class ThreeBit(long[] registers, params (int, int)[] input)
+public class ThreeBit(int[] registers, params (int, int)[] input)
 {
-    private readonly long[] registers = registers;
+    private readonly int[] registers = registers;
     private readonly (int, int)[] program = input;
-    private List<long> output = [];
-    private readonly long registerA = registers[0];
-    public long index;
+    private readonly List<int> output = [];
+    private readonly int registerA = registers[0];
+    public int index;
 
-    public void SetRegister(long reg, long val) => registers[reg] = val;
-    public long GetRegister(long reg) => registers[reg];
-    public long GetA() => registers[0];
-    public long GetB() => registers[1];
-    public long GetC() => registers[2];
-    public long SetA(long x) => registers[0] = x;
-    public long SetB(long x) => registers[1] = x;
-    public long SetC(long x) => registers[2] = x;
+    public void SetRegister(int reg, int val) => registers[reg] = val;
+    public int GetRegister(int reg) => registers[reg];
+    public int GetA() => registers[0];
+    public int GetB() => registers[1];
+    public int GetC() => registers[2];
+    public int SetA(int x) => registers[0] = x;
+    public int SetB(int x) => registers[1] = x;
+    public int SetC(int x) => registers[2] = x;
 
     public (int, int) NextBatch() => program[index];
     public void IncrementPointer() => index++;
@@ -60,21 +60,21 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
             }
         }
 
-        return isPartTwo ? Print2() : Print();
+        return Print();
     }
 
     public void CodeZero(int operand)
     {
-        long numerator = GetA();
-        long power = ComboValue(operand);
-        long denominator = (long)Math.Pow(2, power);
+        int numerator = GetA();
+        int power = ComboValue(operand);
+        int denominator = (int)Math.Pow(2, power);
 
-        long division = numerator / denominator;
+        int division = numerator / denominator;
 
-        long result = 0;
+        int result = 0;
         checked
         {
-            result = division > long.MaxValue ? long.MaxValue : (long)division;
+            result = division > int.MaxValue ? int.MaxValue : division;
         }
 
         SetA(result);
@@ -83,7 +83,7 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
 
     public void CodeOne(int operand) //Literal
     {
-        long result = 0;
+        int result = 0;
         checked
         {
             result = GetB() ^ operand;
@@ -95,8 +95,8 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
 
     public void CodeTwo(int operand) //Combo
     {
-        long combo = ComboValue(operand);
-        long result = combo % 8;
+        int combo = ComboValue(operand);
+        int result = combo % 8;
 
         SetB(result);
         IncrementPointer();
@@ -116,7 +116,7 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
 
     public void CodeFour(int operand) //Ignored
     {
-        long result = 0;
+        int result = 0;
         checked
         {
             result = GetB() ^ GetC();
@@ -128,8 +128,8 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
 
     public void CodeFive(int operand) //Combo
     {
-        long combo = ComboValue(operand);
-        long result = combo % 8;
+        int combo = ComboValue(operand);
+        int result = combo % 8;
 
         output.Add(result);
         IncrementPointer();
@@ -137,16 +137,16 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
 
     public void CodeSix(int operand) //Combo
     {
-        long numerator = GetA();
-        long power = ComboValue(operand);
-        long denominator = (long)Math.Pow(2, power);
+        int numerator = GetA();
+        int power = ComboValue(operand);
+        int denominator = (int)Math.Pow(2, power);
 
-        long division = numerator / denominator;
+        int division = numerator / denominator;
 
-        long result = 0;
+        int result = 0;
         checked
         {
-            result = division > long.MaxValue ? long.MaxValue : (long)division;
+            result = division > int.MaxValue ? int.MaxValue : (int)division;
         }
 
         SetB(result);
@@ -155,23 +155,23 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
 
     public void CodeSeven(int operand) //Combo
     {
-        long numerator = GetA();
-        long power = ComboValue(operand);
-        long denominator = (long)Math.Pow(2, power);
+        int numerator = GetA();
+        int power = ComboValue(operand);
+        int denominator = (int)Math.Pow(2, power);
 
-        long division = numerator / denominator;
+        int division = numerator / denominator;
 
-        long result = 0;
+        int result = 0;
         checked
         {
-            result = division > long.MaxValue ? long.MaxValue : (long)division;
+            result = division > int.MaxValue ? int.MaxValue : (int)division;
         }
 
         SetC(result);
         IncrementPointer();
     }
 
-    private long ComboValue(int operand) => operand switch
+    private int ComboValue(int operand) => operand switch
     {
         <= 3 => operand,
         4 => GetA(),
@@ -179,4 +179,6 @@ public class ThreeBit(long[] registers, params (int, int)[] input)
         6 => GetC(),
         _ => -1
     };
+
+    private static int Pow2(long exponent) => 1 << (int)exponent; // Faster for powers of 2
 }
