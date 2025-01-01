@@ -3,6 +3,7 @@
 public record Coord(int Row, int Col)
 {
     public static Coord Zero => new(0, 0);
+    public static Coord Invalid => new(-1, -1);
 
     public Coord Up => new(Row - 1, Col);
     public Coord Right => new(Row, Col + 1);

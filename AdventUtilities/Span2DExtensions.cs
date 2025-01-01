@@ -4,6 +4,32 @@ namespace AdventUtilities;
 
 public static class Span2DExtensions
 {
+    public static void Draw2DGridXY<T>(this Span2D<T> grid)
+    {
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                Console.Write($"{grid[y, x]} ");
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    public static void Draw2DGridTightXY<T>(this Span2D<T> grid)
+    {
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                Console.Write($"{grid[y, x]}");
+            }
+
+            Console.WriteLine();
+        }
+    }
+
     public static void Draw2DGrid<T>(this Span2D<T> grid)
     {
         for (int i = 0; i < grid.Height; i++)
@@ -222,6 +248,14 @@ public static class Span2DExtensions
     /// <param name="coord">The Coord class coordinates (Row and Col) of the position.</param>
     public static void SetIntAt(this ref Span2D<int> gridSpan, int number, Coord coord)
         => gridSpan[coord.Row, coord.Col] = number;
+
+    public static void SetAt<T>(this ref Span2D<T> gridSpan, T value, CoordXY coord) => gridSpan[coord.Y, coord.X] = value;
+
+    public static void SetCharAt(this ref Span2D<char> gridSpan, char letter, CoordXY coord)
+        => gridSpan[coord.Y, coord.X] = letter;
+
+    public static void SetIntAt(this ref Span2D<int> gridSpan, int number, CoordXY coord)
+        => gridSpan[coord.Y, coord.X] = number;
 
     /// <summary>
     /// Wipes characters on a given row after the specified column

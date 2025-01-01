@@ -1,4 +1,5 @@
 using System.Text;
+
 using CommunityToolkit.HighPerformance;
 
 namespace AdventUtilities;
@@ -282,7 +283,40 @@ public static class GridExtensions
                 {
                     Console.Write(' ');
                 }
-                else Console.Write(current);
+                else
+                    Console.Write(current);
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    public static void Draw2DGridXY<T>(this T[,] grid)
+    {
+        int maxY = grid.GetLength(0);
+        int maxX = grid.GetLength(1);
+
+        for (int y = 0; y < maxY; y++)
+        {
+            for (int x = 0; x < maxX; x++)
+            {
+                Console.Write($"{grid[y, x]} ");
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    public static void Draw2DGridTightXY<T>(this T[,] grid)
+    {
+        int maxY = grid.GetLength(0);
+        int maxX = grid.GetLength(1);
+
+        for (int y = 0; y < maxY; y++)
+        {
+            for (int x = 0; x < maxX; x++)
+            {
+                Console.Write($"{grid[y, x]}");
             }
 
             Console.WriteLine();
