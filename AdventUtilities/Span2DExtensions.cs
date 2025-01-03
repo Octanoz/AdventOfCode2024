@@ -396,4 +396,16 @@ public static class Span2DExtensions
 
         return result;
     }
+
+    public static int CountDots(this Span2D<char> gridSpan)
+    {
+        int dots = 0;
+        for (int i = 0; i < gridSpan.Height; i++)
+        {
+            Span<char> row = gridSpan.GetRowSpan(i);
+            dots += System.MemoryExtensions.Count(row, '.');
+        }
+
+        return dots;
+    }
 }
