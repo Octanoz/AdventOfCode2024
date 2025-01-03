@@ -65,3 +65,31 @@ In this example, 6 of the eight designs are possible with the available towel pa
 ## Challenge 1
 
 To get into the onsen as soon as possible, consult your list of towel patterns and desired designs carefully. How many designs are possible?
+
+<hr><br>
+
+# Part Two
+
+The staff don't really like some of the towel arrangements you came up with. To avoid an endless cycle of towel rearrangement, maybe you should just give them every possible option.
+
+## Examples
+
+Here are all of the different ways the previous example's designs can be made:
+
+| Design | Posibble combinations |
+|--------|-----------------------|
+| brwrr | b, r, wr, r <br> br, wr, r |
+| bggr | b, g, g, and r |
+| gbbr | g, b, b, r <br> g, b, br <br> gb, b, r <br> gb, br |
+| rrbgbr | r, r, b, g, b, r <br> r, r, b, g, br <br> r, r, b, gb, r <br> r, rb, g, b, r <br> r, rb, g, br <br> r, rb, gb, r |
+| bwurrg | bwu, r, r, g |
+| brgr | b, r, g, r <br> br, g, r |
+| ubwu | X |
+| bbrgwb | X |
+
+
+Adding up all of the ways the towels in this example could be arranged into the desired designs yields $16$ $(2 + 1 + 4 + 6 + 1 + 2)$
+
+## Challenge 2
+
+They'll let you into the onsen as soon as you have the list. What do you get if you add up the number of different ways you could make each design?
