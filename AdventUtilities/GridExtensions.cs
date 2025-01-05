@@ -44,12 +44,11 @@ public static class GridExtensions
 
     public static T[,] New2DGrid<T>(string[] input, int elementLength)
     {
-        string[][] chunks = input.Select(s => s
-                                        .Select(c => c)
-                                        .Chunk(elementLength)
-                                        .Select(cArray => new string(cArray))
-                                        .ToArray())
-                                    .ToArray();
+        string[][] chunks = input.Select(s => s.Select(c => c)
+                                               .Chunk(elementLength)
+                                               .Select(cArray => new string(cArray))
+                                               .ToArray())
+                                 .ToArray();
 
         int rows = chunks.Length;
         int cols = chunks[0].Length;
@@ -175,6 +174,23 @@ public static class GridExtensions
         }
     }
 
+    public static bool[,] Generate2DBool<T>(this T[,] grid)
+    {
+        int maxRow = grid.GetLength(0);
+        int maxCol = grid.GetLength(1);
+        bool[,] boolArray = new bool[maxRow, maxCol];
+
+        for (int row = 0; row < maxRow; row++)
+        {
+            for (int col = 0; col < maxCol; col++)
+            {
+                boolArray[row, col] = false;
+            }
+        }
+
+        return boolArray;
+    }
+
     public static void Draw2DGridTight<T>(this T[,] grid)
     {
         int rows = grid.GetLength(0);
@@ -268,7 +284,7 @@ public static class GridExtensions
         }
     }
 
-    public static void DrawIntJaggedGrid(this int[][] grid)
+    public static void DrawIntJaggedGrid(this int[][] grid, int skipNumber = 0)
     {
         int maxRow = grid.Length;
         int maxCol = grid[0].Length;
@@ -279,7 +295,7 @@ public static class GridExtensions
             {
                 int current = grid[row][col];
 
-                if (current is 0)
+                if (current == skipNumber)
                 {
                     Console.Write(' ');
                 }
