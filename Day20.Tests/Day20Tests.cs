@@ -50,4 +50,58 @@ public class Day20Tests
         Assert.Equal(1, cheatsCount[40]);
         Assert.Equal(1, cheatsCount[64]);
     }
+
+    [Fact]
+    public void Mapper_PartOne_Puzzle_Should_Return_Correct_Number_Of_Cheats_Per_Second()
+    {
+        //Arrange
+        string[] input = File.ReadAllLines(puzzlePath);
+
+        //Act
+        Dictionary<int, int> cheatsCount = Mapper.PartOne(input);
+
+        //Assert
+        Assert.Equal(1311, cheatsCount.Values.Sum());
+    }
+
+    [Fact]
+    public void Mapper_PartTwo_TestData_Should_Return_Correct_Number_Of_Cheats_Per_Seconds_Improved()
+    {
+        //Arrange
+        string[] input = File.ReadAllLines(testPath);
+
+        //Act
+        Dictionary<int, int> cheatsCount = Mapper.PartTwo(input, true);
+
+        //Assert
+        Assert.Equal(32, cheatsCount[50]);
+        Assert.Equal(31, cheatsCount[52]);
+        Assert.Equal(29, cheatsCount[54]);
+        Assert.Equal(39, cheatsCount[56]);
+        Assert.Equal(25, cheatsCount[58]);
+        Assert.Equal(23, cheatsCount[60]);
+        Assert.Equal(20, cheatsCount[62]);
+        Assert.Equal(19, cheatsCount[64]);
+        Assert.Equal(12, cheatsCount[66]);
+        Assert.Equal(14, cheatsCount[68]);
+        Assert.Equal(12, cheatsCount[70]);
+        Assert.Equal(22, cheatsCount[72]);
+        Assert.Equal(4, cheatsCount[74]);
+        Assert.Equal(3, cheatsCount[76]);
+    }
+
+    [Fact]
+    public void Mapper_PartTwo_Puzzle_Should_Return_Correct_Number_Of_Cheats_Per_Second()
+    {
+        //Arrange
+        string[] input = File.ReadAllLines(puzzlePath);
+
+        //Act
+        Dictionary<int, int> cheatsCount = Mapper.PartTwo(input);
+
+        //Assert
+        Assert.Equal(961364, cheatsCount.Values.Sum());
+    }
+
+
 }

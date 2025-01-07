@@ -11,8 +11,4 @@
     <ProjectReference Include="..\AdventUtilities\AdventUtilities.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="SuperLinq" Version="6.2.0" />
-  </ItemGroup>
-
 </Project>

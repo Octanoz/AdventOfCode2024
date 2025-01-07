@@ -1,4 +1,5 @@
-﻿
+﻿#define PART1
+#undef PART1
 using AdventUtilities;
 
 using Day20;
@@ -9,7 +10,9 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day20/input.txt")
 };
 
-string[] input = File.ReadAllLines(filePaths["challenge"]);
+
+#if PART1
+input = File.ReadAllLines(filePaths["challenge"]);
 Dictionary<int, int> cheatFrequencies = Mapper.PartOne(input);
 
 foreach (var kvp in cheatFrequencies)
@@ -18,6 +21,16 @@ foreach (var kvp in cheatFrequencies)
 }
 
 Console.WriteLine(cheatFrequencies.Values.Sum());
+#else
 
-//Travel in opposite direction and mark every open space with the steps from the finish.
-//Compare distance to go between current position and position after one wall cell
+string[] input = File.ReadAllLines(filePaths["challenge"]);
+Dictionary<int, int> testFrequencies = Mapper.PartTwo(input);
+
+foreach (var kvp in testFrequencies)
+{
+    Console.WriteLine(kvp);
+}
+
+Console.WriteLine(testFrequencies.Values.Sum());
+
+#endif

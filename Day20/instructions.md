@@ -180,20 +180,20 @@ You'll still need a list of the best cheats, but now there are even more to choo
 
 | Cheats | Time Saved |
 |--------|------------|
-There are 32 cheats that save 50 picoseconds.
-There are 31 cheats that save 52 picoseconds.
-There are 29 cheats that save 54 picoseconds.
-There are 39 cheats that save 56 picoseconds.
-There are 25 cheats that save 58 picoseconds.
-There are 23 cheats that save 60 picoseconds.
-There are 20 cheats that save 62 picoseconds.
-There are 19 cheats that save 64 picoseconds.
-There are 12 cheats that save 66 picoseconds.
-There are 14 cheats that save 68 picoseconds.
-There are 12 cheats that save 70 picoseconds.
-There are 22 cheats that save 72 picoseconds.
-There are 4 cheats that save 74 picoseconds.
-There are 3 cheats that save 76 picoseconds.
+| 32 | 50 |
+| 31 | 52 |
+| 29 | 54 |
+| 39 | 56 |
+| 25 | 58 |
+| 23 | 60 |
+| 20 | 62 |
+| 19 | 64 |
+| 12 | 66 |
+| 14 | 68 |
+| 12 | 70 |
+| 22 | 72 |
+| 4 | 74 |
+| 3 | 76 |
 
 ## Challenge 2
 

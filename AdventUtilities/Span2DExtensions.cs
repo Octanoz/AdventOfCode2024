@@ -1,6 +1,6 @@
-using CommunityToolkit.HighPerformance;
-
 namespace AdventUtilities;
+
+using CommunityToolkit.HighPerformance;
 
 public static class Span2DExtensions
 {
@@ -408,4 +408,5 @@ public static class Span2DExtensions
 
         return dots;
     }
+
 }
