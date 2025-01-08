@@ -23,18 +23,14 @@ Unfortunately, the area outside the door is currently *depressurized* and nobody
 The robot has no problem navigating the ship and finding the numeric keypad, but it's not designed for button pushing: it can't be told to push a specific button directly. Instead, it has a robotic arm that can be controlled remotely via a *directional keypad*.
 
 The directional keypad has two rows of buttons: 
-- a gap / `^` (up) / `A` (activate) on the first row
--  `<` (left) / `v` (down) / `>` (right) on the second row.
+- a `gap` | `^` (up) | `A` (activate) on the first row
+-  `<` (left) | `v` (down) | `>` (right) on the second row.
 
 Visually, they are arranged like this:
 
-
-        +---+---+
-        | ^ | A |
-    +---+---+---+
-    | < | v | > |
-    +---+---+---+
-
+| GAP | ^ | A |
+|:---:|:-:|:-:|
+| < | v | > |
 
 When the robot arrives at the numeric keypad, its robotic arm is pointed at the `A` button in the bottom right corner. After that, this directional keypad remote control must be used to maneuver the robotic arm: the `up` / `down` / `left` / `right` buttons cause it to move its arm `one button` in that direction, and the `A` button causes the robot to briefly move forward, pressing the button being aimed at by the robotic arm.
 
@@ -62,7 +58,10 @@ Unfortunately, the area containing this third directional keypad remote control 
 
 Were you to choose this sequence of button presses, here are all of the buttons that would be pressed on your directional keypad, the two robots' directional keypads, and the numeric keypad:
 
-    <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>Av<<A>>^A<A>AvA<^AA>A<vAAA>^A<A^A>^^AvvvA029A
+    <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
+    v<<A>>^A<A>AvA<^AA>A<vAAA>^A
+    <A^A>^^AvvvA
+    029A
 
 In summary, there are the following keypads:
 
@@ -84,11 +83,11 @@ To unlock the door, *five* codes will need to be typed on its numeric keypad. Fo
 
 For each of these, here is a shortest sequence of button presses you could type to cause the desired code to be typed on the numeric keypad:
 
-    029A: <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>
-    A980A: <v<A>>^AAAvA^A<vA<AA>>^AvAA<^A>A<v<A>A>^AAAvA<^A>A<vA>^A<A>
-    A179A: <v<A>>^A<vA<A>>^AAvAA<^A>A<v<A>>^AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>
-    A456A: <v<A>>^AA<vA<A>>^AAvAA<^A>A<vA>^A<A>A<vA>^A<A>A<v<A>A>^AAvA<^A>
-    A379A: <v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
+    029A: <vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A
+    980A: <v<A>>^AAAvA^A<vA<AA>>^AvAA<^A>A<v<A>A>^AAAvA<^A>A<vA>^A<A>A
+    179A: <v<A>>^A<vA<A>>^AAvAA<^A>A<v<A>>^AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
+    456A: <v<A>>^AA<vA<A>>^AAvAA<^A>A<vA>^A<A>A<vA>^A<A>A<v<A>A>^AAvA<^A>A
+    379A: <v<A>>^AvA^A<vA<AA>>^AAvA<^A>AAvA^A<vA>^AA<A>A<v<A>A>^AAAvA<^A>A
 
 The Historians are getting nervous; the ship computer doesn't remember whether the missing Historian is trapped in the area containing a *giant electromagnet* or *molten lava*. You'll need to make sure that for each of the five codes, you find the *shortest sequence* of button presses necessary.
 
@@ -98,5 +97,7 @@ The *complexity* of a single code (like `029A`) is equal to the result of multip
 - The *numeric part of the code* (ignoring leading zeroes); for `029A`, this would be $29$.
 
 In the above example, complexity of the five codes can be found by calculating $$(68 \times 29) + (60 \times 980) + (68 \times 179) + (64 \times 456) + (64 \times 379) = 126384$$
+
+## Challenge 1
 
 Find the fewest number of button presses you'll need to perform in order to cause the robot in front of the door to type each code. *What is the sum of the complexities of the five codes on your list?*

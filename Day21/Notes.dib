@@ -1,0 +1,17 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+string[] numberStringArray = "0,1,2,3,4,5,B,6,7,8,9".Split(',');
+(bool, int)[] sumArray = numberStringArray.Select(s => (int.TryParse(s, out int num), num)).ToArray();
+
+char three = '3';
+Console.WriteLine($"{(int)(three - '0')}");
+
+var someNums = Enumerable.Range(0, 10).Select(n => (n, n % 3));
+foreach (var tup in someNums)
+{
+    Console.WriteLine(tup);
+}

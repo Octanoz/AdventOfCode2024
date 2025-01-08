@@ -60,6 +60,9 @@ public static class CoordExtensions
     /// <returns></returns>
     public static IEnumerable<Coord> GetAllNeighbours(this Coord coord, TableContext tc) => coord.GetAllNeighbours(tc.MaxRow, tc.MaxCol);
 
+    public static IEnumerable<Coord> GetValidNeighbours(this Coord coord, int maxRow, int maxCol)
+        => coord.Neighbours.Where(nb => nb.Row >= 0 && nb.Row < maxRow && nb.Col >= 0 && nb.Col < maxCol);
+
     /// <summary>
     /// Returns the coordinates stored in the Neighbours Enumerable of the curent Coord coordinate and checks that they are
     /// within the limits of the map stored in the TableContext object
@@ -198,4 +201,5 @@ public static class CoordExtensions
         _ => throw new ArgumentOutOfRangeException(nameof(dir), dir, null)
     }; */
 
+    public static (int, int) Tupled(this Coord coord) => (coord.Row, coord.Col);
 }
