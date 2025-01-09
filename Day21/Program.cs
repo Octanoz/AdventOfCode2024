@@ -1,4 +1,5 @@
-﻿
+﻿#define PART1
+#undef PART1
 using AdventUtilities;
 
 using Day21;
@@ -9,16 +10,13 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day21/input.txt")
 };
 
-string testInput = "029A";
-/* NumpadOperator numOp = new(testInput.ToCharArray());
-string numpadInput = numOp.EnterCode();
-Console.WriteLine(numpadInput);
+string[] input = File.ReadAllLines(filePaths["challenge"]);
 
-KeypadOperator keyOp = new(numpadInput);
-string keypadInput = keyOp.EnterCode(); */
+#if PART1
+int result = KeypadManager.PartOne(input);
+#else
+ulong result = KeypadManager.PartTwo(input);
+#endif
 
-string[] input = File.ReadAllLines(filePaths["example1"]);
-
-int result = OperatorManager.PartOne(input);
 Console.WriteLine(result);
 
