@@ -111,7 +111,7 @@ So, if a buyer starts with a secret number of `123`, that buyer's first ten secr
 
 >Note that the first price has no associated change because there was no previous price to compare it with.
 
-In this short example, within just these first few prices, the highest price will be `6`, so it would be nice to give the monkey instructions that would make it sell at that time. The first `6` occurs after only two changes, so there's no way to instruct the monkey to sell then, but the second `6` occurs after the changes `-1,-1,0,2`. So, if you gave the monkey that sequence of changes, it would wait until the first time it sees that sequence and then immediately sell your hiding spot information at the current price, winning you `6` bananas.
+In this short example, within just these first few prices, the highest price will be `6`, so it would be nice to give the monkey instructions that would make it sell at that time. The first `6` occurs after only two changes, so there's no way to instruct the monkey to sell then, but the second `6` occurs after the changes `[-1,-1,0,2]`. So, if you gave the monkey that sequence of changes, it would wait until the first time it sees that sequence and then immediately sell your hiding spot information at the current price, winning you `6` bananas.
 
 Each buyer only wants to buy one hiding spot, so after the hiding spot is sold, the monkey will move on to the next buyer. If the monkey *never* hears that sequence of price changes from a buyer, the monkey will never sell, and will instead just move on to the next buyer.
 
@@ -126,12 +126,12 @@ Suppose the initial secret number of each buyer is:
     3
     2024
 
-There are many sequences of four price changes you could tell the monkey, but for these four buyers, the sequence that will get you the most bananas is `-2,1,-1,3`. Using that sequence, the monkey will make the following sales:
+There are many sequences of four price changes you could tell the monkey, but for these four buyers, the sequence that will get you the most bananas is `[-2, 1, -1, 3]`. Using that sequence, the monkey will make the following sales:
 
-- For the buyer with an initial secret number of `1`, changes `-2,1,-1,3` first occur when the price is `7`.
-- For the buyer with initial secret `2`, changes `-2,1,-1,3` first occur when the price is `7`.
-- For the buyer with initial secret `3`, the change sequence `-2,1,-1,3` *does not occur* in the first 2000 changes.
-- For the buyer starting with `2024`, changes `-2,1,-1,3` first occur when the price is `9`.
+- For the buyer with an initial secret number of `1`, changes `[-2, 1, -1, 3]` first occur when the price is `7`.
+- For the buyer with initial secret `2`, changes `[-2, 1, -1, 3]` first occur when the price is `7`.
+- For the buyer with initial secret `3`, the change sequence `[-2, 1, -1, 3]` *does not occur* in the first 2000 changes.
+- For the buyer starting with `2024`, changes `[-2, 1, -1, 3]` first occur when the price is `9`.
 
 So, by asking the monkey to sell the first time each buyer's prices go down `2`, then up `1`, then down `1`, then up `3`, you would get `23` ($7 + 7 + 9$) bananas!
 

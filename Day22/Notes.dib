@@ -1,0 +1,10 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+int num = 14;
+string line = "some text";
+
+Console.WriteLine($"Number: {num}\nLine: {line}");

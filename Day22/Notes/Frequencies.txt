@@ -1,0 +1,12 @@
+Digit 0: 837 occurrences
+Digit 1: 820 occurrences
+Digit 2: 793 occurrences
+Digit 3: 781 occurrences
+Digit 4: 809 occurrences
+Digit 5: 782 occurrences
+Digit 6: 798 occurrences
+Digit 7: 753 occurrences
+Digit 8: 781 occurrences
+Digit 9: 846 occurrences
+
+--------------------------

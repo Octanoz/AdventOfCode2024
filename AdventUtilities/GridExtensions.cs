@@ -117,6 +117,21 @@ public static class GridExtensions
         return grid;
     }
 
+    public static int[,] New2DIntGridBlank(int rows, int cols)
+    {
+        int[,] grid = new int[rows, cols];
+
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < cols; j++)
+            {
+                grid[i, j] = 0;
+            }
+        }
+
+        return grid;
+    }
+
     private static Func<char, T> GetCharConvertFunc<T>()
     {
         return Type.GetTypeCode(typeof(T)) switch
