@@ -60,14 +60,16 @@ In this example, there are `12` such sets of three inter-connected computers:
 
 If the Chief Historian is here, *and* he's at the LAN party, it would be best to know that right away. You're pretty sure his computer's name starts with `t`, so consider only sets of three computers where at least one computer's name starts with `t`. That narrows the list down to `7` sets of three inter-connected computers:
 
-    co,de,ta
-    co,ka,ta
-    de,ka,ta
-    qp,td,wh
-    tb,vc,wq
-    tc,td,wh
-    td,wh,yn
+| Computer IDs |
+|:------------:|
+| co, de, **>ta** |
+| co, ka, **>ta** |
+| de, ka, **>ta** |
+| qp, **>td**, wh |
+| **>tb**, vc, wq |
+| **>tc**, **>td**, wh |
+| **>td**, wh, yn |
 
 ## Challenge 1
 
-Find all the sets of three inter-connected computers. *How many contain at least one computer with a name that starts with `t`?*
+Find all the sets of three inter-connected computers. How many contain at least one computer with a name that starts with `t`?
