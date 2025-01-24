@@ -1,3 +1,51 @@
 #!meta
 
 {"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+public class DataHolder
+{
+    private static List<int> globalNumbers = [];
+
+    public List<int> numbers = [];
+
+    public void AddNumber(int num) => globalNumbers.Add(num);
+    public List<int> GetNumbers() => globalNumbers;
+    public List<int> GetSafeNumbers() => new(globalNumbers);
+    public void ListNumbers() => globalNumbers.ForEach(Console.WriteLine);
+}
+
+DataHolder dhOne = new();
+DataHolder dhTwo = new();
+
+dhOne.numbers.AddRange([1,2,3]);
+dhTwo.numbers.AddRange([4,5,6]);
+
+dhOne.AddNumber(2);
+dhOne.AddNumber(4);
+dhOne.AddNumber(6);
+
+dhTwo.AddNumber(10);
+dhTwo.AddNumber(11);
+dhTwo.AddNumber(12);
+
+dhOne.ListNumbers();
+
+#!csharp
+
+var separateList = dhOne.GetSafeNumbers();
+separateList.Add(9);
+separateList.RemoveAll(n => n > 9);
+
+separateList.ForEach(Console.WriteLine);
+dhOne.ListNumbers();
+
+#!csharp
+
+var sameList = dhOne.GetNumbers();
+sameList.Add(9);
+sameList.RemoveAll(n => n > 9);
+
+sameList.ForEach(Console.WriteLine);
+dhOne.ListNumbers();
