@@ -1,0 +1,33 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+BitArray bits = new(5);
+bits[4] = true;
+
+char[] charBits = new char[5];
+for (int i = 0; i < 5; i++)
+{
+    Console.Write($"{bits[i]} ");
+    charBits[i] = bits[i] ? '1' : '0';
+}
+Console.WriteLine("\n");
+
+Array.Reverse(charBits);
+Console.WriteLine($"CharBits array: [{String.Join(", ", charBits)}]");
+
+int num = Convert.ToInt32(new string(charBits), 2);
+Console.WriteLine($"Number: {num}");
+
+int[] altNums = new int[1];
+bits.CopyTo(altNums, 0);
+
+Console.WriteLine($"Alternatively: {altNums[0]}");
+
+#!csharp
+
+char two = '2';
+
+Console.WriteLine((int)(two - '0'));

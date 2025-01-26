@@ -74,6 +74,8 @@ If the Chief Historian is here, *and* he's at the LAN party, it would be best to
 
 Find all the sets of three inter-connected computers. How many contain at least one computer with a name that starts with `t`?
 
+>Answer: 1344
+
 <hr><br>
 
 # Part Two

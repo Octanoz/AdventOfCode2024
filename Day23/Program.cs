@@ -1,4 +1,7 @@
-﻿using AdventUtilities;
+﻿#define PART1
+#undef PART1
+
+using AdventUtilities;
 
 using Day23;
 
@@ -8,17 +11,12 @@ Dictionary<string, string> filePaths = new()
     ["challenge"] = Path.Combine(InputData.GetSolutionDirectory(), "Day23/input.txt")
 };
 
-string[] input = await File.ReadAllLinesAsync(filePaths["challenge"]);
+string[] input = File.ReadAllLines(filePaths["challenge"]);
+
+#if PART1
 int result = EasterBunnyAdmin.PartOne(input);
-
 Console.WriteLine(result);
-
-/*Dictionary<string, int> frequencies = input.SelectMany(elem => elem.Split('-'))
-                                           .CountBy(s => s)
-                                           .ToDictionary(g => g.Key, g => g.Value);
-
-// using StreamWriter sw = new("Notes/frequencies.txt", true);
-foreach (var kvp in frequencies)
-{
-    Console.WriteLine(kvp);
-}*/
+#else
+string longestCluster = EasterBunnyAdmin.PartTwo(input);
+Console.WriteLine(longestCluster);
+#endif

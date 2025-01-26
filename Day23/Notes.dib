@@ -49,3 +49,7 @@ sameList.RemoveAll(n => n > 9);
 
 sameList.ForEach(Console.WriteLine);
 dhOne.ListNumbers();
+
+#!csharp
+
+var numList = (List<int>)[1,2,3,4];

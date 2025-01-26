@@ -14,8 +14,8 @@ public class Node(string name)
 
 public static class NodeExtensions
 {
-    public static bool FormsCluster(this Node origin, Node checkedNode)
-        => checkedNode.Connections.Any(n => n.Connections.Contains(origin));
+    public static bool ConnectsToTarget(this Node node, Node target)
+        => node.Connections.Any(n => n.Connections.Contains(target));
 
     public static IEnumerable<(Node, Node, Node)> GetThreeClusters(this Node origin, Node checkedNode)
     {
