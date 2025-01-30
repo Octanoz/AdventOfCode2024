@@ -28,9 +28,9 @@ The directional keypad has two rows of buttons:
 
 Visually, they are arranged like this:
 
-| GAP | ^ | A |
+|  | <kbd>^</kbd> | <kbd>A</kbd> |
 |:---:|:-:|:-:|
-| < | v | > |
+| <kbd><</kbd> | <kbd>v</kbd> | <kbd>></kbd> |
 
 When the robot arrives at the numeric keypad, its robotic arm is pointed at the `A` button in the bottom right corner. After that, this directional keypad remote control must be used to maneuver the robotic arm: the `up` / `down` / `left` / `right` buttons cause it to move its arm `one button` in that direction, and the `A` button causes the robot to briefly move forward, pressing the button being aimed at by the robotic arm.
 

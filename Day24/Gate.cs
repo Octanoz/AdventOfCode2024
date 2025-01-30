@@ -7,7 +7,7 @@ public class Gate(Logical log, Wire inWire1, Wire inWire2, string outputWire)
     public Wire InWire2 { get; private set; } = inWire2;
     public string OutputWire { get; } = outputWire;
 
-    private int ProcessOutputValue(int wire1, int wire2) => Log switch
+    private int ProcessOutputValue(int wire1, int wire2) => log switch
     {
         Logical.And => (wire1 & wire2),
         Logical.Or => (wire1 | wire2),
@@ -17,7 +17,6 @@ public class Gate(Logical log, Wire inWire1, Wire inWire2, string outputWire)
 
     public void SetWire1(BitValue bv) => InWire1.BitValue = bv;
     public void SetWire2(BitValue bv) => InWire2.BitValue = bv;
-
     public void SetWires(BitValue bv1, BitValue bv2)
     {
         SetWire1(bv1);
@@ -37,6 +36,7 @@ public class Gate(Logical log, Wire inWire1, Wire inWire2, string outputWire)
         bv = (BitValue)ProcessOutputValue((int)InWire1.BitValue, (int)InWire2.BitValue);
         return true;
     }
+
 }
 
 public enum Logical

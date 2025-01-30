@@ -13,17 +13,14 @@ public static class NumberCooking
     }
     public static long ProcessSecretNumber(long secretNumber)
     {
-        long multiplication = secretNumber * 64;
-        long mixedMultiplication = Mix(multiplication, secretNumber);
-        secretNumber = Prune(mixedMultiplication);
+        long multiplication = secretNumber << 6;
+        secretNumber = Prune(Mix(multiplication, secretNumber));
 
-        long division = (long)Math.Floor(secretNumber / 32.0);
-        long mixedDivision = Mix(division, secretNumber);
-        secretNumber = Prune(mixedDivision);
+        long division = secretNumber >> 5;
+        secretNumber = Prune(Mix(division, secretNumber));
 
-        long multiplyTwoKilobytes = secretNumber * 2048;
-        long mixedTwoKBMultiplication = Mix(multiplyTwoKilobytes, secretNumber);
-        secretNumber = Prune(mixedTwoKBMultiplication);
+        long multiplyTwoKilobytes = secretNumber << 11;
+        secretNumber = Prune(Mix(multiplyTwoKilobytes, secretNumber));
 
         return secretNumber;
     }

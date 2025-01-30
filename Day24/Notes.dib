@@ -28,6 +28,25 @@ Console.WriteLine($"Alternatively: {altNums[0]}");
 
 #!csharp
 
-char two = '2';
+public record struct Wire(string Name, int Value);
 
-Console.WriteLine((int)(two - '0'));
+string[] wireStrings = ["x00: 1", "x01: 1", "x02: 1", "y00: 0", "y01: 1", "y02: 0"];
+
+Wire[] wireArray = wireStrings.Select(s => s.Split(": ")).Select(arr => new Wire(arr[0], arr[1][0] - '0')).ToArray();
+
+Array.ForEach(wireArray, w => Console.WriteLine($"[{w.Name}, {w.Value}]"));
+
+long xValue = wireArray.Where(w => w.Name.StartsWith(('x'))).Sum(w => w.Value is 1 ? 1L << int.Parse(w.Name[1..]) : 0);
+
+long yValue = wireArray.Where(w => w.Name.StartsWith('y')).Select(w => w.Value is 1 ? 1L << int.Parse(w.Name[1..]) : 0).Sum();
+
+Console.WriteLine($"X: {xValue}\nY: {yValue}");
+
+#!csharp
+
+bool[] booleans = [true, true, false, true, false, true];
+
+string binaryString = String.Join("", booleans.Select(b => b ? '1' : '0').Reverse());
+string altBinaryString = new(booleans.Select(b => b ? '1' : '0').Reverse().ToArray());
+
+Console.WriteLine($"Join: {binaryString}\nNew: {altBinaryString}");
