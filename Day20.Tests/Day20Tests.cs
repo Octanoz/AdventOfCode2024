@@ -17,7 +17,7 @@ public class Day20Tests
         Coord correctExit = new(7, 5);
 
         string[] input = File.ReadAllLines(testPath);
-        char[,] charGrid = GridExtensions.New2DGridWithDimensions<char>(input, out int maxRow, out int maxCol);
+        char[,] charGrid = input.New2DGridWithDimensions<char>(out int maxRow, out int maxCol);
         TableContext tc = new(charGrid, maxRow, maxCol);
 
         //Act

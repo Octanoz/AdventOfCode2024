@@ -23,7 +23,7 @@ public class Tracker(string[] input)
     {
         int maxRow = input.Length;
         int maxCol = input[0].Length;
-        char[][] map = GridExtensions.JaggedCharArray(input);
+        char[][] map = input.JaggedCharArray();
         map[current.Row][current.Col] = Guard;
         Direction dir = new();
 
@@ -48,7 +48,7 @@ public class Tracker(string[] input)
     {
         Coord guard = GetGuardPosition(input);
 
-        char[][] map = GridExtensions.JaggedCharArray(input);
+        char[][] map = input.JaggedCharArray();
         List<Coord> potentialObstacles = ScanMap(map, guard);
 
         int loops = 0;

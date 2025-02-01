@@ -16,7 +16,7 @@ public static class Mapper
 {
     public static Dictionary<int, int> PartOne(string[] input, bool isTest = false)
     {
-        char[,] charGrid = GridExtensions.New2DGridWithDimensions<char>(input, out int maxRow, out int maxCol);
+        char[,] charGrid = input.New2DGridWithDimensions<char>(out int maxRow, out int maxCol);
         TableContext tc = new(charGrid, maxRow, maxCol);
         int[,] numGrid = CharToInt2D(tc);
 
@@ -27,7 +27,7 @@ public static class Mapper
 
     public static Dictionary<int, int> PartTwo(string[] input, bool isTest = false)
     {
-        char[,] charGrid = GridExtensions.New2DGridWithDimensions<char>(input, out int maxRow, out int maxCol);
+        char[,] charGrid = input.New2DGridWithDimensions<char>(out int maxRow, out int maxCol);
         TableContext tc = new(charGrid, maxRow, maxCol);
         int[,] numGrid = CharToInt2D(tc);
 

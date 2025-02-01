@@ -408,5 +408,4 @@ public static class Span2DExtensions
 
         return dots;
     }
-
 }

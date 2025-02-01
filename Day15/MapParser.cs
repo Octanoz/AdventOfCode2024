@@ -21,7 +21,7 @@ public static class MapParser
             ParseDirections(sr, moves);
         }
 
-        return GridExtensions.JaggedCharArray(lines.ToArray());
+        return lines.ToArray().JaggedCharArray();
     }
 
     private static void ParseDirections(StreamReader sr, List<Direction> moves)
@@ -76,7 +76,8 @@ public static class MapParser
                     letterArray[i - 1] = storedString[0];
                     letterArray[i] = storedString[1];
                 }
-                else break;
+                else
+                    break;
             }
 
             lines.Add(letterArray);

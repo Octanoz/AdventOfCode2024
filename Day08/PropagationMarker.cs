@@ -21,7 +21,7 @@ public class PropagationMarker(string[] input)
         FindAntennae();
         FindAntinodes2();
 
-        char[][] matrix = GridExtensions.JaggedCharArray(input);
+        char[][] matrix = input.JaggedCharArray();
         foreach (var coord in antinodes)
         {
             matrix[coord.Row][coord.Col] = '#';

@@ -1,4 +1,5 @@
 using AdventUtilities;
+
 using CommunityToolkit.HighPerformance;
 
 namespace Day12;
@@ -7,7 +8,7 @@ public static class FencePricing
 {
     public static int PartOne(string[] input)
     {
-        char[][] map = GridExtensions.JaggedCharArray(input);
+        char[][] map = input.JaggedCharArray();
         HashSet<Coord> visited = [];
         List<Perimeter> perimeters = [];
 
@@ -38,7 +39,7 @@ public static class FencePricing
 
     public static int PartTwo(string[] input)
     {
-        char[,] inputMap = GridExtensions.New2DGrid<char>(input);
+        char[,] inputMap = input.New2DGrid<char>();
         Span2D<char> map = inputMap;
         HashSet<Coord> visited = [];
         List<Perimeter2D> perimeters = [];

@@ -1,4 +1,5 @@
 using AdventUtilities;
+
 using CommunityToolkit.HighPerformance;
 
 namespace Day16;
@@ -7,7 +8,7 @@ public static class MazeRunner
 {
     public static int PartOne(string[] input)
     {
-        char[,] mainMap = GridExtensions.New2DGrid<char>(input);
+        char[,] mainMap = input.New2DGrid<char>();
         Span2D<char> map = mainMap;
         Coord start = new(map.Height - 2, 1);
 
@@ -54,7 +55,7 @@ public static class MazeRunner
 
     public static int PartTwo(string[] input)
     {
-        char[,] mainMap = GridExtensions.New2DGrid<char>(input);
+        char[,] mainMap = input.New2DGrid<char>();
         Span2D<char> map = mainMap;
         Coord start = new(1, map.Width - 2); //Start from E
 

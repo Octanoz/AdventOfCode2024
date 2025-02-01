@@ -1,4 +1,5 @@
 {
     "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-    "workbench.editor.sharedViewState": true
+    "workbench.editor.sharedViewState": true,
+    "dotnet.defaultSolution": "AoC2024.sln"
 }

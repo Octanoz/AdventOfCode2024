@@ -9,7 +9,7 @@ public class SchematicsReader(string filePath)
     private static readonly List<Lock> locks = [];
     private static readonly List<Key> keys = [];
 
-    public void ProcessInput(string filePath)
+    public void ProcessInput()
     {
         using StreamReader sr = new(filePath);
         while (!sr.EndOfStream)
@@ -22,8 +22,10 @@ public class SchematicsReader(string filePath)
     {
         int[] columns = [-1, -1, -1, -1, -1];
         string[] schematic = new string[7];
-        string line = sr.ReadLine() ?? throw new InvalidDataException($"Trying to parse an empty file");
+
+        string? line = sr.ReadLine() ?? throw new InvalidDataException($"Trying to parse an empty file");
         bool isLock = line[0] is '#';
+
         int index = 0;
         while (!String.IsNullOrEmpty(line))
         {
@@ -31,7 +33,7 @@ public class SchematicsReader(string filePath)
             line = sr.ReadLine();
         }
 
-        Span2D<char> schematicSpan = GridExtensions.New2DGrid<char>(schematic);
+        Span2D<char> schematicSpan = schematic.New2DGrid<char>();
         for (int i = 0; i < columns.Length; i++)
         {
             foreach (var letter in schematicSpan.GetColumn(i))
@@ -43,10 +45,14 @@ public class SchematicsReader(string filePath)
             }
         }
 
-
+        if (isLock)
+        {
+            locks.Add(new(columns));
+        }
+        else
+            keys.Add(new(columns));
     }
+
+    public List<Lock> GetLocks() => new(locks);
+    public List<Key> GetKeys() => new(keys);
 }
-
-public record Lock(int[] Columns);
-
-public record Key(int[] Columns);

@@ -1,4 +1,5 @@
 using System.Data;
+
 using AdventUtilities;
 
 namespace Day05;
@@ -12,8 +13,8 @@ public class OrderValidator(string[] input)
     public int Process(bool isPartTwo = false)
     {
         int splitIndex = Array.FindIndex(input, s => s == "");
-        var rules = GridExtensions.JaggedIntArray(input[..splitIndex], '|');
-        var manuals = GridExtensions.JaggedIntArray(input[(splitIndex + 1)..], ',');
+        var rules = input[..splitIndex].JaggedIntArray('|');
+        var manuals = input[(splitIndex + 1)..].JaggedIntArray(',');
 
         PopulateBranches(rules);
         ValidateManuals(manuals, isPartTwo);
@@ -113,7 +114,8 @@ public class OrderValidator(string[] input)
                         {
                             currentList.Add(rule[1]);
                         }
-                        else currentList.Insert(beforeIndex, rule[1]);
+                        else
+                            currentList.Insert(beforeIndex, rule[1]);
 
                         changed = true;
                     }

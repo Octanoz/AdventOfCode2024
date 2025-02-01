@@ -27,7 +27,7 @@ public class Day18Tests
 
 
         //Act
-        int result = Plotter.PartOne(testPath);
+        int result = Plotter.PartOne(puzzlePath);
 
         //Assert
         Assert.Equal(364, result);

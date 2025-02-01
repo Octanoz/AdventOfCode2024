@@ -6,7 +6,7 @@ namespace AdventUtilities;
 
 public static class GridExtensions
 {
-    public static T[,] New2DGrid<T>(string[] input)
+    public static T[,] New2DGrid<T>(this string[] input)
     {
         int rows = input.Length;
         int cols = input[0].Length;
@@ -42,7 +42,7 @@ public static class GridExtensions
         return grid;
     }
 
-    public static T[,] New2DGrid<T>(string[] input, int elementLength)
+    public static T[,] New2DGrid<T>(this string[] input, int elementLength)
     {
         string[][] chunks = input.Select(s => s.Select(c => c)
                                                .Chunk(elementLength)
@@ -66,7 +66,7 @@ public static class GridExtensions
         return grid;
     }
 
-    public static T[,] New2DGridWithDimensions<T>(Span<string> input, out int rows, out int cols)
+    public static T[,] New2DGridWithDimensions<T>(this Span<string> input, out int rows, out int cols)
     {
         rows = input.Length;
         cols = input[0].Length;
@@ -84,7 +84,7 @@ public static class GridExtensions
         return grid;
     }
 
-    public static T[,] New2DGridWithDimensions<T>(string[] input, out int rows, out int cols)
+    public static T[,] New2DGridWithDimensions<T>(this string[] input, out int rows, out int cols)
     {
         rows = input.Length;
         cols = input[0].Length;
@@ -153,9 +153,9 @@ public static class GridExtensions
         };
     }
 
-    public static char[][] JaggedCharArray(string[] input) => input.Select(s => s.ToCharArray()).ToArray();
+    public static char[][] JaggedCharArray(this string[] input) => input.Select(s => s.ToCharArray()).ToArray();
 
-    public static int[][] JaggedIntArray(string[] input, char divider) =>
+    public static int[][] JaggedIntArray(this string[] input, char divider) =>
         input.Select(s => s.Split(divider))
              .Select(sArray => sArray.Select(int.Parse).ToArray())
              .ToArray();
@@ -169,7 +169,7 @@ public static class GridExtensions
         Enumerable.Range(0, maxRow)
                   .Select(_ => Enumerable.Repeat(0, maxCol).ToArray())
                   .ToArray();
-    public static int[][] JaggedIntArrayDivider(string[] input, char divider) =>
+    public static int[][] JaggedIntArrayDivider(this string[] input, char divider) =>
         input.Select(s => s.Split(divider))
              .Select(sArray => sArray.Select(int.Parse).ToArray())
              .ToArray();

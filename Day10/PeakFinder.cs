@@ -1,4 +1,5 @@
 using AdventUtilities;
+
 using CommunityToolkit.HighPerformance;
 
 namespace Day10;
@@ -14,7 +15,7 @@ public static class PeakFinder
                                                                                 .Where(col => col.Item is '0')
                                                                                 .Select(col => new Coord(row.Index, col.Index)));
 
-        char[,] map = GridExtensions.New2DGridWithDimensions<char>(input, out int maxRow, out int maxCol);
+        char[,] map = input.New2DGridWithDimensions<char>(out int maxRow, out int maxCol);
 
         Dictionary<Coord, HashSet<Coord>> trailheadRoutes = [];
         Span2D<char> mapSpan = map;
@@ -60,7 +61,7 @@ public static class PeakFinder
                                                     .Where(col => col.Item is '0')
                                                     .Select(col => new Coord(row.Index, col.Index)));
 
-        char[,] map = GridExtensions.New2DGridWithDimensions<char>(input, out int maxRow, out int maxCol);
+        char[,] map = input.New2DGridWithDimensions<char>(out int maxRow, out int maxCol);
 
         Span2D<char> mapSpan = map;
         Queue<(Coord, Coord)> trails = [];
